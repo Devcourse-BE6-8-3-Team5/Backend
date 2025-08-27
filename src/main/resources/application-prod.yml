@@ -1,0 +1,41 @@
+spring:
+  datasource:
+    url: ${DATABASE_URL}
+    hikari:
+      maximum-pool-size: 10     # 동시에 열리는 연결 수
+      minimum-idle: 5           # 최소 유지 연결 수
+      idle-timeout: 300000      # 사용하지 않는 연결 최대 유지 시간(ms)
+      max-lifetime: 1800000     # 연결 최대 생존 시간(ms)
+      connection-timeout: 30000 # 커넥션 가져오는 최대 시간(ms)
+      auto-commit: true
+      pool-name: HikariPool
+      validation-timeout: 5000
+
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect  # 명시적으로 PostgreSQLDialect 지정
+        format_sql: true
+        show_sql: false
+  ai:
+    openai:
+      chat:
+        options:
+          model: "gemini-2.5-flash"
+
+server:
+  address: 0.0.0.0
+  port: 8080
+  forward-headers-strategy: native
+  servlet:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+
+custom:
+  jwt:
+    secretKey: ${JWT_SECRET_KEY}
