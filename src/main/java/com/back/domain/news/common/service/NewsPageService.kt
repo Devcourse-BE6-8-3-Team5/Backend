@@ -46,7 +46,7 @@ class NewsPageService {
         newsType: NewsType,
         id: Long
     ): RsData<T> {
-        val newsTypeDescription: String? = newsType.description
+        val newsTypeDescription: String = newsType.description
 
         return news
             .map { dto -> RsData.of(200, "${id}번 $newsTypeDescription 뉴스 조회", dto) }
