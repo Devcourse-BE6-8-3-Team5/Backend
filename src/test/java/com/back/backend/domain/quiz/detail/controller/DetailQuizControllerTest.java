@@ -6,7 +6,6 @@ import com.back.domain.member.member.entity.Member;
 import com.back.domain.member.member.service.MemberService;
 import com.back.domain.quiz.detail.dto.DetailQuizDto;
 import com.back.domain.quiz.detail.entity.Option;
-import com.back.domain.quiz.detail.service.DetailQuizService;
 import com.back.global.rq.Rq;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,12 +33,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @TestPropertySource(properties = {
         "NAVER_CLIENT_ID=test_client_id",
         "NAVER_CLIENT_SECRET=test_client_secret",
-        "GEMINI_API_KEY=api_key"
+        "HEALTHCHECK_URL=health_check_url",
+        "GEMINI_API_KEY=gemini_api_key"
 })
 @Import(TestRqConfig.class)
 class DetailQuizControllerTest {
-    @Autowired
-    private DetailQuizService detailQuizService;
     @Autowired
     private MemberService memberService;
     @Autowired
@@ -49,8 +47,6 @@ class DetailQuizControllerTest {
 
     @Autowired
     private Rq rq;
-
-    private Member testMember;
 
 
     @BeforeEach
