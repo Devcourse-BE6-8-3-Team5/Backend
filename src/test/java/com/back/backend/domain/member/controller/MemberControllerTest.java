@@ -29,7 +29,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @Transactional
 @TestPropertySource(properties = {
         "NAVER_CLIENT_ID=test_client_id_for_testing_only",
-        "NAVER_CLIENT_SECRET=test_client_secret_for_testing_only"
+        "NAVER_CLIENT_SECRET=test_client_secret_for_testing_only",
+        "HEALTHCHECK_URL=https://hc-ping.com/8bbf100d-5404-4c5e-a172-516985b353fe"
 })
 public class MemberControllerTest {
 
@@ -472,10 +473,10 @@ public class MemberControllerTest {
         String accessToken = loginResult.andReturn().getResponse().getCookie("accessToken").getValue();
 
         // 일반 유저가 관리자 페이지 접근 (403 에러)
-        mvc.perform(get("/관리자페이지")
+        mvc.perform(get("/api/admin/members")
                         .cookie(new jakarta.servlet.http.Cookie("accessToken", accessToken)))
                 .andDo(print())
-                .andExpect(status().isUnauthorized());
+                .andExpect(status().isForbidden());
     }
 
     @Test
@@ -514,10 +515,10 @@ public class MemberControllerTest {
     }
 
     @Test
-    @DisplayName("인증 없이 관리자 페이지 접근 시 403에러")
+    @DisplayName("인증 없이 관리자 페이지 접근 시 401에러")
     void no_auth_access_admin_page_forbidden() throws Exception {
         // 인증 없이 관리자 페이지 접근
-        mvc.perform(get("/관리자페이지"))
+        mvc.perform(get("/api/admin/members"))
                 .andDo(print())
                 .andExpect(status().isUnauthorized());
     }
@@ -548,10 +549,10 @@ public class MemberControllerTest {
         String accessToken = loginResult.andReturn().getResponse().getCookie("accessToken").getValue();
 
         // 일반 유저가 관리자 전용 API 접근 (403 에러)
-        mvc.perform(delete("/관리자페이지뉴스삭제")
+        mvc.perform(delete("/api/admin/members")
                         .cookie(new jakarta.servlet.http.Cookie("accessToken", accessToken)))
                 .andDo(print())
-                .andExpect(status().isUnauthorized());
+                .andExpect(status().isForbidden());
     }
 
 }
