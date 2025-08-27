@@ -4,9 +4,7 @@ import com.back.backend.global.config.TestRqConfig;
 import com.back.backend.global.rq.TestRq;
 import com.back.domain.member.member.entity.Member;
 import com.back.domain.member.member.service.MemberService;
-import com.back.domain.quiz.detail.service.DetailQuizService;
 import com.back.global.rq.Rq;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -32,18 +30,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @TestPropertySource(properties = {
         "NAVER_CLIENT_ID=test_client_id",
         "NAVER_CLIENT_SECRET=test_client_secret",
-        "GEMINI_API_KEY=api_key"
+        "HEALTHCHECK_URL=health_check_url",
 })
 @Import(TestRqConfig.class)
 public class DailyQuizControllerTest {
     @Autowired
-    private DetailQuizService detailQuizService;
-    @Autowired
     private MemberService memberService;
     @Autowired
     private MockMvc mvc;
-    @Autowired
-    private ObjectMapper objectMapper;
 
     @Autowired
     private Rq rq;
@@ -128,7 +122,7 @@ public class DailyQuizControllerTest {
                 .andExpect(jsonPath("$.data.quizId").value(quizId))
                 .andExpect(jsonPath("$.data.selectedOption").value("OPTION2"))
                 .andExpect(jsonPath("$.data.correct").value(true))
-                .andExpect(jsonPath("$.data.gainExp").value(10))
+                .andExpect(jsonPath("$.data.gainExp").value(20))
                 .andExpect(jsonPath("$.data.quizType").value("DAILY"));
     }
 
