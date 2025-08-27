@@ -1,21 +1,21 @@
-name: wakeup-scheduler.yml
-
-on:
-  schedule:
-    - cron: '50 14 * * *'
-    - cron: '50 15 * * *'
-
-
-jobs:
-  wakeup:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Wake up app
-        run: |
-          for i in {1..7}; do
-            curl -f https://news-ox.fly.dev/health
-            echo "Ping $i/7 sent"
-            if [ $i -lt 7 ]; then
-              sleep 300  # 5분 대기
-            fi
-          done
+#name: wakeup-scheduler.yml
+#
+#on:
+#  schedule:
+#    - cron: '50 14 * * *'
+#    - cron: '50 15 * * *'
+#
+#
+#jobs:
+#  wakeup:
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Wake up app
+#        run: |
+#          for i in {1..7}; do
+#            curl -f https://news-ox.fly.dev/health
+#            echo "Ping $i/7 sent"
+#            if [ $i -lt 7 ]; then
+#              sleep 300  # 5분 대기
+#            fi
+#          done
