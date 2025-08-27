@@ -1,6 +1,8 @@
 plugins {
     kotlin("jvm") version "1.9.25" // 추가
     kotlin("plugin.spring") version "1.9.25" // 추가
+    kotlin("plugin.jpa") version "1.9.25"
+    kotlin("kapt") version "1.9.25"
     id("org.springframework.boot") version "3.4.2"
     id("io.spring.dependency-management") version "1.1.7"
 }
@@ -29,6 +31,9 @@ repositories {
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     runtimeOnly("org.postgresql:postgresql:42.7.3")
+    implementation("io.github.openfeign.querydsl:querydsl-jpa:7.0")
+    kapt("io.github.openfeign.querydsl:querydsl-apt:7.0:jpa")
+
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
     implementation("io.jsonwebtoken:jjwt-api:0.12.6")
@@ -76,4 +81,19 @@ dependencyManagement {
 
 tasks.named<Test>("test") {
     useJUnitPlatform()
+}
+
+kapt {
+    arguments {
+        arg("querydsl.entityAccessors", "true")
+        arg("querydsl.kotlin.entityAccessors", "true")
+    }
+}
+
+sourceSets {
+    main {
+        java {
+            srcDir("$buildDir/generated/source/kapt/main")
+        }
+    }
 }
