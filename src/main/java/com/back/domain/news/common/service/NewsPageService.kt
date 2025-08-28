@@ -11,7 +11,7 @@ class NewsPageService {
     fun <T> getPagedNews(
         newsPage: Page<T>,
         newsType: NewsType
-    ): RsData<Page<T>> {
+    ): RsData<Page<T>?> {
 
         return when {
             newsPage.totalPages == 0 -> RsData.of(404, "${newsType.description} 뉴스가 없습니다")
