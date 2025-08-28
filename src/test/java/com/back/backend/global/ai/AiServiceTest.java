@@ -1,5 +1,6 @@
 package com.back.backend.global.ai;
 
+import com.back.domain.quiz.detail.dto.DetailQuizCreateReqDto;
 import com.back.domain.quiz.detail.dto.DetailQuizDto;
 import com.back.domain.quiz.detail.entity.Option;
 import com.back.global.ai.AiService;
@@ -9,23 +10,12 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.model.ChatResponse;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.TestPropertySource;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
 
-@ActiveProfiles("test")
-@SpringBootTest
-@TestPropertySource(properties = {
-        "NAVER_CLIENT_ID=test_client_id",
-        "NAVER_CLIENT_SECRET=test_client_secret",
-        "HEALTHCHECK_URL=health_check_url",
-        "GEMINI_API_KEY=gemini_api_key"
-})
 public class AiServiceTest {
     @Test
     @DisplayName("process(with DetailQuizProcessor)는 파싱된 결과값을 반환해야 한다")
@@ -68,7 +58,7 @@ public class AiServiceTest {
         AiService aiService = new AiService(mockChatClient, objectMapper);
 
         DetailQuizProcessor processor = new DetailQuizProcessor(
-                new com.back.domain.quiz.detail.dto.DetailQuizCreateReqDto("제목", "본문"),
+                new DetailQuizCreateReqDto("제목", "본문"),
                 objectMapper
         );
 
@@ -77,6 +67,7 @@ public class AiServiceTest {
 
         // then
         System.out.println(result);
+        assertThat(result).hasSize(3);
 
         // 첫 번째 퀴즈 검증
         DetailQuizDto firstQuiz = result.get(0);
@@ -86,9 +77,9 @@ public class AiServiceTest {
         assertThat(firstQuiz.option3()).isEqualTo("Claude 4");
         assertThat(firstQuiz.correctOption()).isEqualTo(Option.OPTION1);
 
-        // 세 번째 퀴즈도 OPTION1이 정답인지 확인 (다양성 검증)
-        DetailQuizDto thirdQuiz = result.get(2);
-        assertThat(thirdQuiz.correctOption()).isEqualTo(Option.OPTION1);
+        // 두번째, 세번째 퀴즈 정답 포지션 검증 (다양성 검증)
+        assertThat(result.get(1).correctOption()).isEqualTo(Option.OPTION3);
+        assertThat(result.get(2).correctOption()).isEqualTo(Option.OPTION1);
     }
 }
 

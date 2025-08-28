@@ -97,7 +97,7 @@ class DetailQuizProcessorTest {
     }
 
     @Test
-    @DisplayName("parseResponse는 null 응답에 대해 예외를 던져야 한다.")
+    @DisplayName("parseResponse는 빈 응답에 대해 예외를 던져야 한다.")
     void t3() {
         // given
         DetailQuizProcessor processor = new DetailQuizProcessor(defaultRequest, objectMapper);
