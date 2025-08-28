@@ -76,7 +76,7 @@ public class MemberService {
                 encodedPassword,
                 0,
                 1,
-                "user",
+                "USER",
                 UUID.randomUUID().toString(),
                 oauthId
         );

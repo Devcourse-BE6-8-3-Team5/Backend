@@ -28,9 +28,11 @@ class Member() {
     @Column(nullable = false, unique = true)
     lateinit var email: String
 
-    var exp: @Min(0) Int = 0 //경험치
+    @field:Min(0)
+    var exp: Int = 0 //경험치
 
-    var level: @Min(1) Int = 1 //레벨
+    @field:Min(1)
+    var level: Int = 1 //레벨
 
     @Column(nullable = false)
     lateinit var role: String // "USER" 또는 "ADMIN"
