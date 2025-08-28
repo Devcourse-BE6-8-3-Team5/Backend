@@ -3,6 +3,8 @@ package com.back.backend.domain.news.real.controller
 import com.back.backend.global.config.TestRqConfig
 import com.back.backend.global.rq.TestRq
 import com.back.domain.member.member.entity.Member
+import com.back.domain.news.common.enums.NewsCategory
+import com.back.domain.news.real.entity.RealNews
 import com.back.domain.news.real.repository.RealNewsRepository
 import com.back.global.rq.Rq
 import org.hamcrest.Matchers.startsWith
@@ -21,6 +23,7 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import org.springframework.transaction.annotation.Transactional
+import java.time.LocalDateTime
 
 
 @ActiveProfiles("test")
@@ -31,7 +34,8 @@ import org.springframework.transaction.annotation.Transactional
     properties = [
         "NAVER_CLIENT_ID=test_client_id",
         "NAVER_CLIENT_SECRET=test_client_secret",
-        "GEMINI_API_KEY=api_key"
+        "GEMINI_API_KEY=api_key",
+        "HEALTHCHECK_URL=abc"
     ]
 )
 @Import(TestRqConfig::class)
@@ -49,38 +53,38 @@ class NewsControllerTest {
     fun setUp() {
         val admin = Member(1, "admin@123", "admin", "ADMIN")
         (rq as TestRq).setActor(admin)
-//      TODO : test 변환 진행전
-//        realNewsRepository.save<RealNews>(
-//            RealNews.builder()
-//                .title("Test News Title")
-//                .content("This is a test news content.")
-//                .link("http://example.com/news/1")
-//                .imgUrl("http://example.com/news/1/image.jpg")
-//                .description("Test news description.")
-//                .originCreatedDate(LocalDateTime.now())
-//                .createdDate(LocalDateTime.now().minusDays(5))
-//                .originalNewsUrl("http://example.com/original/news/1")
-//                .mediaName("Test Media")
-//                .journalist("Test Journalist")
-//                .newsCategory(NewsCategory.IT)
-//                .build()
-//        )
-//
-//        realNewsRepository.save<RealNews?>(
-//            RealNews.builder()
-//                .title("Test News Title2")
-//                .content("This is a test news content.")
-//                .link("http://example.com/news/1")
-//                .imgUrl("http://example.com/news/1/image.jpg")
-//                .description("Test news description.")
-//                .originCreatedDate(LocalDateTime.now())
-//                .createdDate(LocalDateTime.now().minusDays(5))
-//                .originalNewsUrl("http://example.com/original/news/1")
-//                .mediaName("Test Media")
-//                .journalist("Test Journalist")
-//                .newsCategory(NewsCategory.IT)
-//                .build()
-//        )
+
+        realNewsRepository.save(
+            RealNews(
+                title = "Test News Title",
+                content = "This is a test news content.",
+                link = "http://example.com/news/1",
+                imgUrl = "http://example.com/news/1/image.jpg",
+                description = "Test news description.",
+                originCreatedDate = LocalDateTime.now(),
+                createdDate = LocalDateTime.now().minusDays(5),
+                originalNewsUrl = "http://example.com/original/news/1",
+                mediaName = "Test Media",
+                journalist = "Test Journalist",
+                newsCategory = NewsCategory.IT
+            )
+        )
+
+        realNewsRepository.save(
+            RealNews(
+                title = "Test News Title2",
+                content = "This is a test news2 content.",
+                link = "http://example.com/news/2",
+                imgUrl = "http://example.com/news/2/image.jpg",
+                description = "Test news description2.",
+                originCreatedDate = LocalDateTime.now(),
+                createdDate = LocalDateTime.now().minusDays(5),
+                originalNewsUrl = "http://example.com/original/news/2",
+                mediaName = "Test Media",
+                journalist = "Test Journalist",
+                newsCategory = NewsCategory.IT
+            )
+        )
     }
 
 

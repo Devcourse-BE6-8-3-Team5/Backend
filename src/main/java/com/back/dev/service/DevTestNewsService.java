@@ -117,8 +117,8 @@ public class DevTestNewsService {
             //한 필드라도 비어있으면 건너뜀
             if(cleanedTitle.isEmpty()|| originallink.isEmpty() || link.isEmpty() || cleanDescription.isEmpty() || pubDate.isEmpty())
                 continue;
-            //팩토리 메서드 사용
-            NaverNewsDto newsDto = NaverNewsDto.of(cleanedTitle, originallink, link, cleanDescription, pubDate);
+
+            NaverNewsDto newsDto = new NaverNewsDto(cleanedTitle, originallink, link, cleanDescription, pubDate);
             newsMetaDataList.add(newsDto);
         }
 
