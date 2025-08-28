@@ -462,7 +462,7 @@ class NewsDataService(
         val today = LocalDate.now(ZoneId.of("Asia/Seoul"))
         todayNewsRepository!!.deleteBySelectedDate(today)
 
-        val todayNews = TodayNew(
+        val todayNews = TodayNews(
              selectedDate = today,
              realNews = realNews
         )
