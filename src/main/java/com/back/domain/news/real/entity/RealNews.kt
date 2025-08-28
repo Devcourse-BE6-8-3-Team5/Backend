@@ -28,10 +28,6 @@ import java.time.LocalDateTime
     )]
 )
 data class RealNews(
-    @field:Id
-    @field:GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long = 0,
-
     @field:Lob
     val content: String,
 
@@ -49,7 +45,11 @@ data class RealNews(
     val createdDate: LocalDateTime,
 
     @field:Enumerated(EnumType.STRING)
-    val newsCategory: NewsCategory
+    val newsCategory: NewsCategory,
+
+    @field:Id
+    @field:GeneratedValue(strategy = GenerationType.IDENTITY)
+    val id: Long = 0
 ) { // 상세 퀴즈와 1:N 관계 설정 (RealNews 하나 당 3개의 DetailQuiz가 생성됩니다.)
     @field:OneToMany(mappedBy = "realNews", cascade = [CascadeType.ALL], orphanRemoval = true)
     @JsonIgnore

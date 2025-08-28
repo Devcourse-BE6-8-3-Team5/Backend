@@ -87,7 +87,6 @@ public class DevInitData {
                 "https://imgnews.pstatic.net/image/088/2025/07/29/0000961622_001_20250729133508809.jpg?type=w860",
                 LocalDateTime.now().minusDays(2),
                 LocalDateTime.now().minusDays(1),
-
                 "매일신문",
                 "정은빈 기자",
                 "https://www.imaeil.com/page/view/2025072913253167202",
