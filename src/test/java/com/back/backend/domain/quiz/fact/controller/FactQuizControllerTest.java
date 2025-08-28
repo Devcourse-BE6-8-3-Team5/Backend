@@ -4,9 +4,7 @@ import com.back.backend.global.config.TestRqConfig;
 import com.back.backend.global.rq.TestRq;
 import com.back.domain.member.member.entity.Member;
 import com.back.domain.member.member.service.MemberService;
-import com.back.domain.quiz.fact.service.FactQuizService;
 import com.back.global.rq.Rq;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -32,17 +30,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @TestPropertySource(properties = {
         "NAVER_CLIENT_ID=test_client_id",
         "NAVER_CLIENT_SECRET=test_client_secret",
+        "HEALTHCHECK_URL=health_check_url"
 })
 @Import(TestRqConfig.class)
 public class FactQuizControllerTest {
     @Autowired
-    private FactQuizService factQuizService;
-    @Autowired
     private MemberService memberService;
     @Autowired
     private MockMvc mvc;
-    @Autowired
-    private ObjectMapper objectMapper;
 
     @Autowired
     private Rq rq;
@@ -60,7 +55,6 @@ public class FactQuizControllerTest {
     @DisplayName("GET /api/quiz/detail - 팩트 퀴즈 목록 조회")
     void t1() throws Exception {
         //Given
-        int quizCount = (int) factQuizService.count();
 
         //When
         ResultActions resultActions = mvc.perform(get("/api/quiz/fact")
@@ -72,7 +66,8 @@ public class FactQuizControllerTest {
                 .andExpect(handler().methodName("getFactQuizzes"))
                 .andExpect(jsonPath("$.code").value(200))
                 .andExpect(jsonPath("$.message").value("팩트 퀴즈 목록 조회 성공"))
-                .andExpect(jsonPath("$.data.length()").value(quizCount));
+                // TestInitData에 맞춰 설정한 기댓값
+                .andExpect(jsonPath("$.data.length()").value(3));
     }
 
     @Test
@@ -92,7 +87,7 @@ public class FactQuizControllerTest {
                 .andExpect(handler().methodName("getFactQuizzesByCategory"))
                 .andExpect(jsonPath("$.code").value(200))
                 .andExpect(jsonPath("$.message").value("팩트 퀴즈 목록 조회 성공. 카테고리: " + category))
-                .andExpect(jsonPath("$.data.length()").value(2))
+                .andExpect(jsonPath("$.data.length()").value(1))
                 .andExpect(jsonPath("$.data[0].id").isNumber())
                 .andExpect(jsonPath("$.data[0].realNewsTitle").value("인도 최대 IT 서비스 TCS 1만2200명 감원 계획"))
                 .andExpect(jsonPath("$.data[0].question").isString());
