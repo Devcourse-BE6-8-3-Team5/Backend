@@ -35,7 +35,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @TestPropertySource(properties = {
         "NAVER_CLIENT_ID=test_client_id",
         "NAVER_CLIENT_SECRET=test_client_secret",
-        "GEMINI_API_KEY=api_key"
+        "GEMINI_API_KEY=api_key",
+        "HEALTHCHECK_URL=health_check_url",
 })
 @Import(TestRqConfig.class)
 public class NewsControllerTest {
