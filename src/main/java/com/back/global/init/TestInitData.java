@@ -197,7 +197,7 @@ public class TestInitData {
         List<RealNewsDto> savedNewsList = newsDataService.saveAllRealNews(newsList);
 
         if (!savedNewsList.isEmpty()) {
-            newsDataService.setTodayNews(savedNewsList.get(1).id());
+            newsDataService.setTodayNews(savedNewsList.get(1).id);
         }
     }
 

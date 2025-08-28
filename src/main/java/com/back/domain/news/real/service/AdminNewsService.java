@@ -17,7 +17,6 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
 @Slf4j
 @Service
@@ -51,11 +50,11 @@ public class AdminNewsService {
                 log.warn("저장된 뉴스가 없습니다. 오늘의 뉴스 수집이 실패했을 수 있습니다.");
                 return;
             }
-            newsDataService.setTodayNews(savedNews.getFirst().id());
+            newsDataService.setTodayNews(savedNews.getFirst().getId());
 
             List<Long> realNewsIds = savedNews.stream()
-                    .map(RealNewsDto::id)
-                    .filter(Objects::nonNull) // null 체크
+                    .map(RealNewsDto::getId)
+//                    .filter(Objects::nonNull) // null 체크
                     .toList();
 
             // 트랜잭션 커밋 이후에 이벤트 발행

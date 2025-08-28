@@ -34,7 +34,7 @@ public class NewsAnalysisProcessor implements AiRequestProcessor<List<AnalyzedNe
         for (int i = 0; i < newsToAnalyze.size(); i++) {
             RealNewsDto news = newsToAnalyze.get(i);
             newsInput.append("뉴스 ").append(i + 1).append(":\n\n")
-                    .append("내용: ").append(cleanText(news.content()))
+                    .append("내용: ").append(cleanText(news.getContent()))
                     .append("\n---\n");
         }
 
@@ -205,18 +205,18 @@ public class NewsAnalysisProcessor implements AiRequestProcessor<List<AnalyzedNe
             RealNewsDto originalNews = newsToAnalyze.get(index);
 
             // 카테고리가 적용된 새로운 RealNewsDto 생성
-            RealNewsDto updatedNews = RealNewsDto.of(
-                    originalNews.id(),
-                    originalNews.title(),
+            RealNewsDto updatedNews = new RealNewsDto(
+                    0L,
+                    originalNews.getTitle(),
                     result.cleanedContent(),
-                    originalNews.description(),
-                    originalNews.link(),
-                    originalNews.imgUrl(),
-                    originalNews.originCreatedDate(),
-                    originalNews.createdDate(),
-                    originalNews.mediaName(),
-                    originalNews.journalist(),
-                    originalNews.originalNewsUrl(),
+                    originalNews.getDescription(),
+                    originalNews.link,
+                    originalNews.imgUrl,
+                    originalNews.originCreatedDate,
+                    originalNews.createdDate,
+                    originalNews.mediaName,
+                    originalNews.journalist,
+                    originalNews.originalNewsUrl,
                     result.category()
             );
 

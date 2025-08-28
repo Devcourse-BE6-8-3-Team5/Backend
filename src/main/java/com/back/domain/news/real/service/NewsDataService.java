@@ -125,7 +125,7 @@ public class NewsDataService {
                 }
 
                 RealNewsDto realNewsDto = makeRealNewsFromInfo(metaData, newsDetailData.get());
-                log.info("새 뉴스 생성 - ID: {}, 제목: {}", realNewsDto.id(), realNewsDto.title());
+                log.info("새 뉴스 생성 - ID: {}, 제목: {}", realNewsDto.getId(), realNewsDto.getTitle());
                 allRealNewsDtos.add(realNewsDto);
 
                 Thread.sleep(crawlingDelay);
@@ -395,8 +395,8 @@ public class NewsDataService {
 
     // 네이버 api에서 받아온 정보와 크롤링한 상세 정보를 바탕으로 RealNewsDto 생성
     public RealNewsDto makeRealNewsFromInfo(NaverNewsDto naverNewsDto, NewsDetailDto newsDetailDto) {
-        return RealNewsDto.of(
-                null, // ID는 null로 시작, 저장 시 자동 생성
+        return new RealNewsDto(
+                0L,
                 naverNewsDto.title(),
                 newsDetailDto.content(),
                 naverNewsDto.description(),
@@ -408,7 +408,6 @@ public class NewsDataService {
                 newsDetailDto.journalist(),
                 naverNewsDto.originallink(),
                 NewsCategory.NOT_FILTERED
-
         );
     }
 

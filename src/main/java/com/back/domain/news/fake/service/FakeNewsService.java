@@ -64,16 +64,16 @@ public class FakeNewsService {
                 .map(realNewsDto -> supplyAsync(() -> {
                     try {
                         rateLimiter.waitForRateLimit(); // Rate limiting은 여기서
-                        log.debug("가짜뉴스 생성 시작 - 실제뉴스 ID: {}", realNewsDto.id());
+                        log.debug("가짜뉴스 생성 시작 - 실제뉴스 ID: {}", realNewsDto.id);
 
                         FakeNewsGeneratorProcessor processor = new FakeNewsGeneratorProcessor(realNewsDto, objectMapper);
                         FakeNewsDto result = aiService.process(processor);
 
-                        log.debug("가짜뉴스 생성 완료 - 실제뉴스 ID: {}", realNewsDto.id());
+                        log.debug("가짜뉴스 생성 완료 - 실제뉴스 ID: {}", realNewsDto.id);
                         return result;
 
                     } catch (Exception e) {
-                        log.error("가짜뉴스 생성 실패 - 실제뉴스 ID: {}", realNewsDto.id(), e);
+                        log.error("가짜뉴스 생성 실패 - 실제뉴스 ID: {}", realNewsDto.id, e);
                         return null;
                     }
                 }, executor)) // ← executor 사용

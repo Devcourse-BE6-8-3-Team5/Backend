@@ -393,7 +393,7 @@ public class DevInitData {
         List<RealNewsDto> savedNewsList = newsDataService.saveAllRealNews(newsList);
 
         if (!savedNewsList.isEmpty()) {
-            newsDataService.setTodayNews(savedNewsList.get(0).id());
+            newsDataService.setTodayNews(savedNewsList.get(0).id);
         }
     }
 

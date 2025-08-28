@@ -24,10 +24,10 @@ public class FakeNewsGeneratorProcessor implements AiRequestProcessor<FakeNewsDt
 
     @Override
     public String buildPrompt() {
-        int contentLength = realNewsDto.content().length();
+        int contentLength = realNewsDto.getContent().length();
 
-        String cleanTitle = cleanText(realNewsDto.title());
-        String cleanContent = cleanText(realNewsDto.content());
+        String cleanTitle = cleanText(realNewsDto.getTitle());
+        String cleanContent = cleanText(realNewsDto.getContent());
 
         return String.format("""
             당신은 가짜 뉴스 창작 전문가입니다. **제목만을 바탕으로** 그럴듯한 가짜 뉴스를 창작하세요.
@@ -173,7 +173,7 @@ public class FakeNewsGeneratorProcessor implements AiRequestProcessor<FakeNewsDt
                 "시스템 관리자에게 문의하시거나 나중에 다시 시도해 주세요."
         );
 
-        return FakeNewsDto.of(realNewsDto.id(), failureContent);
+        return FakeNewsDto.of(realNewsDto.getId(), failureContent);
     }
     /**
      * AI 응답 정리 - 마크다운 코드 블록만 제거
@@ -204,7 +204,7 @@ public class FakeNewsGeneratorProcessor implements AiRequestProcessor<FakeNewsDt
             throw new ServiceException(500, "AI 응답에 content가 누락되었습니다");
         }
 
-        return FakeNewsDto.of(realNewsDto.id(), result.content());
+        return FakeNewsDto.of(realNewsDto.getId(), result.content());
     }
     /**
      * AI 응답 파싱용 내부 레코드
