@@ -4,7 +4,6 @@ import com.back.domain.news.common.dto.KeywordGenerationReqDto;
 import com.back.domain.news.common.dto.KeywordGenerationResDto;
 import com.back.domain.news.common.dto.KeywordWithType;
 import com.back.domain.news.common.enums.KeywordType;
-import com.back.domain.news.fake.dto.FakeNewsDto;
 import com.back.global.exception.ServiceException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.ai.chat.model.ChatResponse;
@@ -156,9 +155,9 @@ public class KeywordGeneratorProcessor implements AiRequestProcessor<KeywordGene
                 }
                 ```
                 """,
-                keywordGenerationReqDto.currentDate,
-                keywordGenerationReqDto.recentKeywordsWithTypes,
-                keywordGenerationReqDto.excludeKeywords);
+                keywordGenerationReqDto.getCurrentDate(),
+                keywordGenerationReqDto.getRecentKeywordsWithTypes(),
+                keywordGenerationReqDto.getExcludeKeywords());
 
     }
 
@@ -226,11 +225,8 @@ public class KeywordGeneratorProcessor implements AiRequestProcessor<KeywordGene
     }
 
     private void validatekeywords(KeywordGenerationResDto result) {
-        if(result.society == null || result.society.size() != 2 ||
-           result.economy == null || result.economy.size() != 2 ||
-           result.politics == null || result.politics.size() != 2 ||
-           result.culture == null || result.culture.size() != 2 ||
-           result.it == null || result.it.size() != 2) {
+        result.getSociety();
+        if(result.getSociety().size() != 2 || result.getEconomy().size() != 2 || result.getPolitics().size() != 2 || result.getCulture().size() != 2 || result.getIt().size() != 2) {
             throw new ServiceException(500, "각 카테고리당 정확히 2개의 키워드가 필요합니다.");
         }
     }

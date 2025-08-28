@@ -56,9 +56,10 @@ class NewsDataService(
     private val realNewsMapper: RealNewsMapper,
     private val objectMapper: ObjectMapper,
     private val rateLimiter: RateLimiter,
-    private val publisher: ApplicationEventPublisher
+    private val publisher: ApplicationEventPublisher,
+    private val restTemplate: RestTemplate
 ) {
-    private val restTemplate: RestTemplate? = null
+
 
     @Value("\${NAVER_CLIENT_ID}")
     private val clientId: String? = null
@@ -143,9 +144,10 @@ class NewsDataService(
 
         val futures = keywords.stream()
             .map { keyword -> this.fetchNews(keyword) as CompletableFuture<*> }
+            .toList()
 
         try {
-            CompletableFuture.allOf(*futures.toList().toTypedArray()).get()
+            CompletableFuture.allOf(*futures.toTypedArray()).get()
 
             for (future in futures) {
                 val news = future.get() as MutableList<NaverNewsDto>
