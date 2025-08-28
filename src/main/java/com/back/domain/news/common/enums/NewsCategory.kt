@@ -6,5 +6,5 @@ enum class NewsCategory(val description: String) {
     POLITICS("정치"),
     CULTURE("문화"),
     IT("IT"),
-    NOT_FILTERED("필터링 전");
+    NOT_FILTERED("필터링 전")
 }
