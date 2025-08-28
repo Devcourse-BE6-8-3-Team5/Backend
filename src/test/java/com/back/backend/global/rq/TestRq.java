@@ -1,7 +1,6 @@
 package com.back.backend.global.rq;
 
 import com.back.domain.member.member.entity.Member;
-import com.back.domain.member.member.service.MemberService;
 import com.back.global.rq.Rq;
 
 public class TestRq extends Rq {

@@ -1,6 +1,5 @@
 package com.back.global.security;
 
-import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -9,13 +8,11 @@ import java.util.Collection;
 import java.util.Map;
 
 public class SecurityUser extends User implements OAuth2User {
-    @Getter
+
     private long id;
 
-    @Getter
     private String name;
 
-    @Getter
     private String email;
 
     public SecurityUser(
@@ -29,6 +26,18 @@ public class SecurityUser extends User implements OAuth2User {
         this.id = id;
         this.name = name;
         this.email = email;
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public String getName() {
+        return name;
     }
 
     @Override
