@@ -483,15 +483,19 @@ public class MemberControllerTest {
     @DisplayName("관리자가 마이페이지 접근 성공")
     void admin_access_myInfo_success() throws Exception {
         // 관리자 회원 생성
-        Member adminMember = Member.builder()
-                .name("관리자2")
-                .email("admin2@example.com")
-                .password("$2a$10$uLw2UPuzvGo5IebUw4pV9uetx9re5IBiedKPAmJkF/X6puaajxuA2")
-                .role("ADMIN")
-                .apiKey(UUID.randomUUID().toString())
-                .exp(0)
-                .level(1)
-                .build();
+
+        Member adminMember = new Member(
+                "관리자",
+                "admin2@example.com",
+                "$2a$10$uLw2UPuzvGo5IebUw4pV9uetx9re5IBiedKPAmJkF/X6puaajxuA2",
+                0,
+                1,
+                "ADMIN",
+                UUID.randomUUID().toString(),
+                null
+
+        );
+
         memberRepository.save(adminMember);
 
         // 관리자 로그인
