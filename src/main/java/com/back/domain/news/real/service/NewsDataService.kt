@@ -11,18 +11,19 @@ import com.back.domain.news.real.repository.RealNewsRepository
 import com.back.domain.news.today.entity.TodayNews
 import com.back.domain.news.today.event.TodayNewsCreatedEvent
 import com.back.domain.news.today.repository.TodayNewsRepository
+import com.back.global.ai.processor.NewsAnalysisProcessor
 import com.back.global.exception.ServiceException
 import com.back.global.rateLimiter.RateLimiter
 import com.back.global.util.HtmlEntityDecoder
+import com.back.standard.extensions.getOrThrow
 import com.fasterxml.jackson.core.JsonProcessingException
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.annotation.PostConstruct
-import lombok.RequiredArgsConstructor
-import lombok.extern.slf4j.Slf4j
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Element
 import org.openkoreantext.processor.OpenKoreanTextProcessorJava
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.data.domain.Page
@@ -50,18 +51,15 @@ import java.util.function.Supplier
 import java.util.stream.Collectors
 import java.util.stream.Stream
 
-@Slf4j
 @Service
-@RequiredArgsConstructor
-class NewsDataService {
-    private val realNewsRepository: RealNewsRepository? = null
-    private val todayNewsRepository: TodayNewsRepository? = null
-    private val realNewsMapper: RealNewsMapper? = null
-    private val objectMapper: ObjectMapper? = null
-    private val rateLimiter: RateLimiter? = null
-    private val publisher: ApplicationEventPublisher? = null
-
-    // HTTP 요청을 보내기 위한 Spring의 HTTP 클라이언트(외부 API 호출 시 사용)
+class NewsDataService(
+    private val realNewsRepository: RealNewsRepository,
+    private val todayNewsRepository: TodayNewsRepository,
+    private val realNewsMapper: RealNewsMapper,
+    private val objectMapper: ObjectMapper,
+    private val rateLimiter: RateLimiter,
+    private val publisher: ApplicationEventPublisher
+) {
     private val restTemplate: RestTemplate? = null
 
     @Value("\${NAVER_CLIENT_ID}")
@@ -88,6 +86,10 @@ class NewsDataService {
     @Value("\${news.dedup.title.threshold}") // 제목 임계값
     private val titleSimilarityThreshold = 0.0
 
+    companion object {
+        private val log = LoggerFactory.getLogger(NewsAnalysisProcessor::class.java)
+    }
+
     // 서비스 초기화 시 설정값 검증
     @PostConstruct
     fun validateConfig() {
@@ -99,8 +101,8 @@ class NewsDataService {
     }
 
     @Transactional
-    fun createRealNewsDtoByCrawl(MetaDataList: MutableList<NaverNewsDto>): MutableList<RealNewsDto?> {
-        val allRealNewsDtos: MutableList<RealNewsDto?> = ArrayList<RealNewsDto?>()
+    fun createRealNewsDtoByCrawl(MetaDataList: MutableList<NaverNewsDto>): MutableList<RealNewsDto> {
+        val allRealNewsDtos: MutableList<RealNewsDto> = ArrayList<RealNewsDto>()
 
         try {
             for (metaData in MetaDataList) {
@@ -108,12 +110,12 @@ class NewsDataService {
 
                 if (newsDetailData.isEmpty()) {
                     // 크롤링 실패 시 해당 뉴스는 건너뜀
-                    NewsDataService.log.warn("크롤링 실패: {}", metaData.link)
+                    log.warn("크롤링 실패: {}", metaData.link)
                     continue
                 }
 
                 val realNewsDto = makeRealNewsFromInfo(metaData, newsDetailData.get())
-                NewsDataService.log.info("새 뉴스 생성 - ID: {}, 제목: {}", realNewsDto.id, realNewsDto.title)
+                log.info("새 뉴스 생성 - ID: {}, 제목: {}", realNewsDto.id, realNewsDto.title)
                 allRealNewsDtos.add(realNewsDto)
 
                 Thread.sleep(crawlingDelay.toLong())
@@ -121,46 +123,44 @@ class NewsDataService {
             return allRealNewsDtos
         } catch (e: InterruptedException) {
             Thread.currentThread().interrupt() // 인터럽트 상태 복원
-            NewsDataService.log.error("크롤링 중 인터럽트 발생", e)
-            return mutableListOf<RealNewsDto?>()
+            log.error("크롤링 중 인터럽트 발생", e)
+            return mutableListOf()
         }
     }
 
     @Transactional
-    fun saveAllRealNews(realNewsDtoList: MutableList<RealNewsDto?>): MutableList<RealNewsDto?> {
+    fun saveAllRealNews(realNewsDtoList: MutableList<RealNewsDto>): MutableList<RealNewsDto> {
         // DTO → Entity 변환 후 저장
-        val realNewsList: MutableList<RealNews?> = realNewsMapper!!.toEntityList(realNewsDtoList)
-        val savedEntities = realNewsRepository!!.saveAll<RealNews?>(realNewsList) // 저장된 결과 받기
+        val realNewsList: MutableList<RealNews> = realNewsMapper.toEntityList(realNewsDtoList)
+        val savedEntities = realNewsRepository.saveAll(realNewsList) // 저장된 결과 받기
 
         // Entity → DTO 변환해서 반환
         return realNewsMapper.toDtoList(savedEntities)
     }
 
     // 네이버 API를 통해 메타데이터 수집
-    fun collectMetaDataFromNaver(keywords: MutableList<String?>): MutableList<NaverNewsDto?> {
-        val allNews: MutableList<NaverNewsDto?> = ArrayList<NaverNewsDto?>()
-        NewsDataService.log.info("네이버 API 호출 시작: {} 개 키워드", keywords.size)
+    fun collectMetaDataFromNaver(keywords: MutableList<String>): MutableList<NaverNewsDto> {
+        val allNews: MutableList<NaverNewsDto> = mutableListOf()
+        log.info("네이버 API 호출 시작: {} 개 키워드", keywords.size)
 
         val futures = keywords.stream()
-            .map<CompletableFuture<MutableList<NaverNewsDto?>?>?> { keyword: String? -> this.fetchNews(keyword!!) }  // 비동기 처리
-            .toList()
+            .map { keyword -> this.fetchNews(keyword) as CompletableFuture<*> }
 
         try {
-            CompletableFuture.allOf(*futures.toTypedArray<CompletableFuture<*>?>()).get()
+            CompletableFuture.allOf(*futures.toList().toTypedArray()).get()
 
             for (future in futures) {
-                val news: MutableList<NaverNewsDto?> = future.get()!!
+                val news = future.get() as MutableList<NaverNewsDto>
 
                 val naverOnly = news.stream()
-                    .filter { dto: NaverNewsDto? -> dto!!.link.contains("n.news.naver.com") }
-                    .toList()
+                    .filter { dto -> dto.link.contains("n.news.naver.com") == true }
 
-                allNews.addAll(naverOnly)
+                allNews.addAll(naverOnly.toList())
             }
         } catch (e: InterruptedException) {
-            NewsDataService.log.error("뉴스 조회가 인터럽트됨", e)
+            log.error("뉴스 조회가 인터럽트됨", e)
         } catch (e: ExecutionException) {
-            NewsDataService.log.error("뉴스 조회 중 오류 발생", e.cause)
+            log.error("뉴스 조회 중 오류 발생", e.cause)
         }
 
         return allNews
@@ -268,9 +268,9 @@ class NewsDataService {
     }
 
     @Async("newsExecutor")
-    fun fetchNews(keyword: String): CompletableFuture<MutableList<NaverNewsDto?>?> {
+    fun fetchNews(keyword: String): CompletableFuture<MutableList<NaverNewsDto>> {
         try {
-            rateLimiter!!.waitForRateLimit()
+            rateLimiter.waitForRateLimit()
 
             val url = naverUrl + keyword + "&display=" + newsDisplayCount + "&sort=" + newsSortOrder
 
@@ -281,33 +281,33 @@ class NewsDataService {
 
             // http 요청 엔티티(헤더+바디) 생성
             // get이라 본문은 없고 헤더만 포함 -> 아래에서 string = null로 설정
-            val entity = HttpEntity<String?>(headers)
+            val entity = HttpEntity<String>(headers)
 
             //http 요청 수행
-            val response = restTemplate!!.exchange<String?>(
+            val response = restTemplate!!.exchange(
                 url, HttpMethod.GET, entity, String::class.java, keyword
             )
 
             if (response.getStatusCode() === HttpStatus.OK) {
                 // JsonNode: json 구조를 트리 형태로 표현. json의 중첩 구조를 탐색할 때 사용
                 // readTree(): json 문자열을 JsonNode 트리로 변환
-                val items = objectMapper!!.readTree(response.getBody()).get("items")
+                val items = objectMapper.readTree(response.getBody()).get("items")
 
                 if (items != null) {
                     val rawNews = getNewsMetaDataFromNaverApi(items)
 
                     // 네이버 뉴스만 필터링
                     val naverOnly = rawNews.stream()
-                        .filter { dto: NaverNewsDto? -> dto!!.link.contains("n.news.naver.com") }
+                        .filter { dto -> dto!!.link.contains("n.news.naver.com") }
                         .toList()
 
                     // 키워드별로 중복 제거 수행
                     val dedupTitle = removeDuplicateByBitSetByField(
-                        naverOnly, NaverNewsDto::title, titleSimilarityThreshold
+                        naverOnly, { dto -> dto!!.title }, titleSimilarityThreshold
                     )
 
                     val dedupDescription = removeDuplicateByBitSetByField(
-                        dedupTitle, NaverNewsDto::description, descriptionSimilarityThreshold
+                        dedupTitle, { dto -> dto!!.description }, descriptionSimilarityThreshold
                     )
 
                     // 12개로 제한
@@ -320,9 +320,9 @@ class NewsDataService {
                         keyword, naverOnly.size, dedupDescription.size, limited.size
                     )
 
-                    return CompletableFuture.completedFuture<MutableList<NaverNewsDto?>?>(limited)
+                    return CompletableFuture.completedFuture(limited.filterNotNull().toMutableList())
                 }
-                return CompletableFuture.completedFuture<MutableList<NaverNewsDto?>?>(ArrayList<NaverNewsDto?>())
+                return CompletableFuture.completedFuture(ArrayList<NaverNewsDto>())
             }
             throw ServiceException(500, "네이버 API 호출 실패: " + response.getStatusCode())
         } catch (e: JsonProcessingException) {
@@ -334,37 +334,37 @@ class NewsDataService {
 
 
     // 단건 크롤링
-    fun crawladditionalInfo(naverNewsUrl: String): Optional<NewsDetailDto?> {
+    fun crawladditionalInfo(naverNewsUrl: String): Optional<NewsDetailDto> {
         try {
             val doc = Jsoup.connect(naverNewsUrl)
                 .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64)") // 브라우저인 척
                 .get() // GET 요청으로 HTML 가져오기 (robots.txt에 걸리지 않도록)
 
 
-            val content = Optional.ofNullable<Element?>(doc.selectFirst("article#dic_area"))
-                .map<String>(Function { element: Element? -> this.extractTextWithLineBreaks(element!!) })
+            val content = Optional.ofNullable<Element>(doc.selectFirst("article#dic_area"))
+                .map<String>(Function { element: Element -> this.extractTextWithLineBreaks(element) })
                 .orElse("")
 
-            val imgUrl = Optional.ofNullable<Element?>(doc.selectFirst("#img1"))
-                .map<String>(Function { element: Element? -> element!!.attr("data-src") })
+            val imgUrl = Optional.ofNullable<Element>(doc.selectFirst("#img1"))
+                .map<String>(Function { element: Element -> element!!.attr("data-src") })
                 .orElse("")
 
-            val journalist = Optional.ofNullable<Element?>(doc.selectFirst("em.media_end_head_journalist_name"))
-                .map<String>(Function { obj: Element? -> obj!!.text() })
+            val journalist = Optional.ofNullable<Element>(doc.selectFirst("em.media_end_head_journalist_name"))
+                .map<String>(Function { obj: Element -> obj!!.text() })
                 .orElse("")
-            val mediaName = Optional.ofNullable<Element?>(doc.selectFirst("img.media_end_head_top_logo_img"))
-                .map<String>(Function { elem: Element? -> elem!!.attr("alt") })
+            val mediaName = Optional.ofNullable<Element>(doc.selectFirst("img.media_end_head_top_logo_img"))
+                .map<String>(Function { elem: Element -> elem!!.attr("alt") })
                 .orElse("")
 
             // 크롤링한 정보가 비어있으면 null 반환
             if (content.isEmpty() || imgUrl.isEmpty() || journalist.isEmpty() || mediaName.isEmpty()) {
-                return Optional.empty<NewsDetailDto?>()
+                return Optional.empty<NewsDetailDto>()
             }
 
-            return Optional.of<NewsDetailDto?>(NewsDetailDto(content, imgUrl, journalist, mediaName))
+            return Optional.of<NewsDetailDto>(NewsDetailDto(content, imgUrl, journalist, mediaName))
         } catch (e: IOException) {
-            NewsDataService.log.warn("크롤링 실패: {}", naverNewsUrl)
-            return Optional.empty<NewsDetailDto?>() // 예외 던지지 않고 빈 값 반환
+            log.warn("크롤링 실패: {}", naverNewsUrl)
+            return Optional.empty<NewsDetailDto>() // 예외 던지지 않고 빈 값 반환
         }
     }
 
@@ -458,7 +458,7 @@ class NewsDataService {
 
     @Transactional
     fun setTodayNews(id: Long) {
-        val realNews = realNewsRepository!!.findById(id).orElseThrow<IllegalArgumentException?>
+        val realNews = realNewsRepository.findById(id).getOrThrow<IllegalArgumentException>()
         (Supplier { IllegalArgumentException("해당 ID의 뉴스가 존재하지 않습니다. ID: " + id) })
 
         val today = LocalDate.now(ZoneId.of("Asia/Seoul"))

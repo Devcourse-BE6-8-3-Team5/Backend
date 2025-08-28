@@ -43,13 +43,13 @@ class KeywordHistoryService(private val keywordHistoryRepository: KeywordHistory
         val existingMap = existingKeywords.stream()
             .collect(
                 Collectors.toMap(
-                    Function { obj: KeywordHistory? -> obj!!.getKeyword() },
-                    Function.identity<KeywordHistory?>()
+                    Function { obj: KeywordHistory -> obj.keyword },
+                    Function.identity<KeywordHistory>()
                 )
             )
 
         // 4. 처리할 데이터 준비
-        val keywordHistories: MutableList<KeywordHistory?> = ArrayList<KeywordHistory?>()
+        val keywordHistories: MutableList<KeywordHistory> = ArrayList()
         for (keyword in keywords) {
             val existing = existingMap.get(keyword.keyword)
             if (existing != null) {
@@ -57,40 +57,40 @@ class KeywordHistoryService(private val keywordHistoryRepository: KeywordHistory
                 keywordHistories.add(existing)
             } else {
                 keywordHistories.add(
-                    KeywordHistory.builder()
-                        .keyword(keyword.keyword)
-                        .keywordType(keyword.keywordType)
-                        .category(category)
-                        .usedDate(usedDate)
-                        .build()
+                    KeywordHistory(
+                        keyword = keyword.keyword,
+                        keywordType = keyword.keywordType,
+                        category = category,
+                        usedDate = usedDate
+                    )
                 )
             }
         }
-        keywordHistoryRepository.saveAll<KeywordHistory?>(keywordHistories)
+        keywordHistoryRepository.saveAll<KeywordHistory>(keywordHistories)
     }
 
     // 1. 최근 5일간 3회 이상 사용된 키워드 (과도한 반복 방지)
     @Transactional(readOnly = true)
-    fun getOverusedKeywords(days: Int, minUsage: Int): MutableList<String?>? {
+    fun getOverusedKeywords(days: Int, minUsage: Int): MutableList<String> {
         val startDate = LocalDate.now().minusDays(days.toLong())
         return keywordHistoryRepository!!.findOverusedKeywords(startDate, minUsage)
     }
 
     @get:Transactional(readOnly = true)
-    val yesterdayKeywords: MutableList<String?>?
+    val yesterdayKeywords: MutableList<String>
         // 2. 어제 사용된 키워드 중 일반적인 것들 (긴급 뉴스 제외)
         get() {
             val yesterday = LocalDate.now().minusDays(1)
-            return keywordHistoryRepository!!.findKeywordsByUsedDate(yesterday)
+            return keywordHistoryRepository.findKeywordsByUsedDate(yesterday)
         }
 
-    fun getRecentKeywords(recentDays: Int): MutableList<String?> {
-        //recentdays이전까지
+    fun getRecentKeywords(recentDays: Int): MutableList<String> {
+
         val startDate = LocalDate.now().minusDays(recentDays.toLong())
-        val histories = keywordHistoryRepository!!.findByUsedDateGreaterThanEqual(startDate)
+        val histories = keywordHistoryRepository.findByUsedDateGreaterThanEqual(startDate)
 
         return histories.stream()
-            .map<String?> { obj: KeywordHistory? -> obj!!.getKeyword() }
+            .map { obj: KeywordHistory -> obj.keyword }
             .distinct()
             .toList()
     }
