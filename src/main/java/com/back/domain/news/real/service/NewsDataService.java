@@ -142,15 +142,8 @@ public class NewsDataService {
     public List<RealNewsDto> saveAllRealNews(List<RealNewsDto> realNewsDtoList) {
         // DTO → Entity 변환 후 저장
         List<RealNews> realNewsList = realNewsMapper.toEntityList(realNewsDtoList);
-        // 엔티티 변환 후 ID 확인
-        for (RealNews entity : realNewsList) {
-            log.debug("엔티티 변환 후 - ID: {}, 제목: {}", entity.getId(), entity.getTitle());
-        }
         List<RealNews> savedEntities = realNewsRepository.saveAll(realNewsList); // 저장된 결과 받기
 
-        for (RealNews saved : savedEntities) {
-            log.info("저장 완료 -  제목: {}", saved.getTitle());
-        }
         // Entity → DTO 변환해서 반환
         return realNewsMapper.toDtoList(savedEntities);
     }

@@ -15,7 +15,7 @@ class NewsPageService {
 
         return when {
             newsPage.totalPages == 0 ->
-                RsData.of(404, "$newsType.description 뉴스가 없습니다")
+                RsData.of(404, "${newsType.description} 뉴스가 없습니다")
 
             newsPage.isEmpty ->
                 RsData.of(400, "요청한 페이지의 범위 초과. 총 ${newsPage.totalPages}페이지 중 ${newsPage.number + 1}페이지를 요청.")

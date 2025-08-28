@@ -204,7 +204,7 @@ class NewsAnalysisProcessor(
 
             // 카테고리가 적용된 새로운 RealNewsDto 생성
             val updatedNews = RealNewsDto(
-                0L,
+                originalNews.id,
                 originalNews.title,
                 result.cleanedContent,
                 originalNews.description,

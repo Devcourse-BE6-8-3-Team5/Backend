@@ -3,9 +3,6 @@ package com.back.backend.domain.news.real.controller
 import com.back.backend.global.config.TestRqConfig
 import com.back.backend.global.rq.TestRq
 import com.back.domain.member.member.entity.Member
-import com.back.domain.member.member.entity.QMember.member
-import com.back.domain.news.common.enums.NewsCategory
-import com.back.domain.news.real.entity.RealNews
 import com.back.domain.news.real.repository.RealNewsRepository
 import com.back.global.rq.Rq
 import org.hamcrest.Matchers.startsWith
@@ -16,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.context.annotation.Import
-import org.springframework.data.jpa.domain.AbstractPersistable_.id
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.TestPropertySource
 import org.springframework.test.web.servlet.MockMvc
@@ -25,7 +21,6 @@ import org.springframework.test.web.servlet.request.MockMvcRequestBuilders
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import org.springframework.transaction.annotation.Transactional
-import java.time.LocalDateTime
 
 
 @ActiveProfiles("test")
@@ -54,38 +49,38 @@ class NewsControllerTest {
     fun setUp() {
         val admin = Member(1, "admin@123", "admin", "ADMIN")
         (rq as TestRq).setActor(admin)
-
-        realNewsRepository.save<RealNews>(
-            RealNews.builder()
-                .title("Test News Title")
-                .content("This is a test news content.")
-                .link("http://example.com/news/1")
-                .imgUrl("http://example.com/news/1/image.jpg")
-                .description("Test news description.")
-                .originCreatedDate(LocalDateTime.now())
-                .createdDate(LocalDateTime.now().minusDays(5))
-                .originalNewsUrl("http://example.com/original/news/1")
-                .mediaName("Test Media")
-                .journalist("Test Journalist")
-                .newsCategory(NewsCategory.IT)
-                .build()
-        )
-
-        realNewsRepository.save<RealNews?>(
-            RealNews.builder()
-                .title("Test News Title2")
-                .content("This is a test news content.")
-                .link("http://example.com/news/1")
-                .imgUrl("http://example.com/news/1/image.jpg")
-                .description("Test news description.")
-                .originCreatedDate(LocalDateTime.now())
-                .createdDate(LocalDateTime.now().minusDays(5))
-                .originalNewsUrl("http://example.com/original/news/1")
-                .mediaName("Test Media")
-                .journalist("Test Journalist")
-                .newsCategory(NewsCategory.IT)
-                .build()
-        )
+//      TODO : test 변환 진행전
+//        realNewsRepository.save<RealNews>(
+//            RealNews.builder()
+//                .title("Test News Title")
+//                .content("This is a test news content.")
+//                .link("http://example.com/news/1")
+//                .imgUrl("http://example.com/news/1/image.jpg")
+//                .description("Test news description.")
+//                .originCreatedDate(LocalDateTime.now())
+//                .createdDate(LocalDateTime.now().minusDays(5))
+//                .originalNewsUrl("http://example.com/original/news/1")
+//                .mediaName("Test Media")
+//                .journalist("Test Journalist")
+//                .newsCategory(NewsCategory.IT)
+//                .build()
+//        )
+//
+//        realNewsRepository.save<RealNews?>(
+//            RealNews.builder()
+//                .title("Test News Title2")
+//                .content("This is a test news content.")
+//                .link("http://example.com/news/1")
+//                .imgUrl("http://example.com/news/1/image.jpg")
+//                .description("Test news description.")
+//                .originCreatedDate(LocalDateTime.now())
+//                .createdDate(LocalDateTime.now().minusDays(5))
+//                .originalNewsUrl("http://example.com/original/news/1")
+//                .mediaName("Test Media")
+//                .journalist("Test Journalist")
+//                .newsCategory(NewsCategory.IT)
+//                .build()
+//        )
     }
 
 
@@ -94,15 +89,15 @@ class NewsControllerTest {
     @Throws(Exception::class)
     fun t1() {
         //Given
-        val newsId=1L
-        val news = realNewsRepository.findById(newsId)
+        val news = realNewsRepository.findAll().first()
+
 
         mvc.get("/api/news/${news.id}") {
         }.andDo {
             print()
         }.andExpect {
             status { isOk() }
-            jsonPath("$.id") { value(newsId) }
+            jsonPath("$.id") { value(news.id) }
             jsonPath("$.createdDate") {
                 value(startsWith(news.createdDate.toString().substring(0, 20)))
             }
