@@ -6,12 +6,10 @@ import com.back.domain.quiz.detail.entity.DetailQuiz;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Getter
 @Setter
 @NoArgsConstructor
 public class DailyQuiz {
@@ -36,5 +34,21 @@ public class DailyQuiz {
     public DailyQuiz(TodayNews todayNews, DetailQuiz detailQuiz) {
         this.todayNews = todayNews;
         this.detailQuiz = detailQuiz;
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public TodayNews getTodayNews() {
+        return todayNews;
+    }
+
+    public DetailQuiz getDetailQuiz() {
+        return detailQuiz;
+    }
+
+    public QuizType getQuizType() {
+        return quizType;
     }
 }
