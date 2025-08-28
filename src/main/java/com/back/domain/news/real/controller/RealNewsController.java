@@ -55,7 +55,7 @@ public class RealNewsController {
         }
 
         Optional<RealNewsDto> realNewsDto = realNewsService.getRealNewsDtoById(newsId);
-        
+
         return newsPageService.getSingleNews(realNewsDto, NewsType.REAL, newsId);
     }
 
@@ -74,7 +74,7 @@ public class RealNewsController {
             return RsData.of(404, "조회할 뉴스가 없습니다.");
         }
 
-        return newsPageService.getSingleNews(todayNews, NewsType.REAL, todayNews.get().id());
+        return newsPageService.getSingleNews(todayNews, NewsType.REAL, todayNews.get().getId());
     }
 
     //다건조회(시간순)

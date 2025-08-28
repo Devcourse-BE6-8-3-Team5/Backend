@@ -125,7 +125,7 @@ public class NewsDataService {
                 }
 
                 RealNewsDto realNewsDto = makeRealNewsFromInfo(metaData, newsDetailData.get());
-                log.info("새 뉴스 생성 - ID: {}, 제목: {}", realNewsDto.id(), realNewsDto.title());
+                log.info("새 뉴스 생성 - ID: {}, 제목: {}", realNewsDto.getId(), realNewsDto.getTitle());
                 allRealNewsDtos.add(realNewsDto);
 
                 Thread.sleep(crawlingDelay);
@@ -142,15 +142,8 @@ public class NewsDataService {
     public List<RealNewsDto> saveAllRealNews(List<RealNewsDto> realNewsDtoList) {
         // DTO → Entity 변환 후 저장
         List<RealNews> realNewsList = realNewsMapper.toEntityList(realNewsDtoList);
-        // 엔티티 변환 후 ID 확인
-        for (RealNews entity : realNewsList) {
-            log.debug("엔티티 변환 후 - ID: {}, 제목: {}", entity.getId(), entity.getTitle());
-        }
         List<RealNews> savedEntities = realNewsRepository.saveAll(realNewsList); // 저장된 결과 받기
 
-        for (RealNews saved : savedEntities) {
-            log.info("저장 완료 -  제목: {}", saved.getTitle());
-        }
         // Entity → DTO 변환해서 반환
         return realNewsMapper.toDtoList(savedEntities);
     }
@@ -395,8 +388,8 @@ public class NewsDataService {
 
     // 네이버 api에서 받아온 정보와 크롤링한 상세 정보를 바탕으로 RealNewsDto 생성
     public RealNewsDto makeRealNewsFromInfo(NaverNewsDto naverNewsDto, NewsDetailDto newsDetailDto) {
-        return RealNewsDto.of(
-                null, // ID는 null로 시작, 저장 시 자동 생성
+        return new RealNewsDto(
+                0L,
                 naverNewsDto.title(),
                 newsDetailDto.content(),
                 naverNewsDto.description(),
@@ -408,7 +401,6 @@ public class NewsDataService {
                 newsDetailDto.journalist(),
                 naverNewsDto.originallink(),
                 NewsCategory.NOT_FILTERED
-
         );
     }
 

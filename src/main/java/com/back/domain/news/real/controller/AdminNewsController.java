@@ -167,7 +167,7 @@ public class AdminNewsController {
 
         Optional<RealNewsDto> todayNews = realNewsService.getRealNewsDtoById(todayNewsId);
 
-        return newsPageService.getSingleNews(todayNews, NewsType.REAL, todayNews.get().id());
+        return newsPageService.getSingleNews(todayNews, NewsType.REAL, todayNews.get().getId());
     }
 
     //다건조회(시간순)

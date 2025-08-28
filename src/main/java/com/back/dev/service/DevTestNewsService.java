@@ -11,23 +11,14 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.openkoreantext.processor.KoreanTokenJava;
-import org.openkoreantext.processor.OpenKoreanTextProcessorJava;
-import org.openkoreantext.processor.tokenizer.KoreanTokenizer;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import scala.collection.JavaConverters;
-import scala.collection.Seq;
 
-import java.util.*;
-import java.util.stream.Collectors;
-
-import static org.openkoreantext.processor.OpenKoreanTextProcessorJava.*;
-import static org.openkoreantext.processor.tokenizer.KoreanTokenizer.*;
-import static scala.collection.JavaConverters.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Slf4j
 @Profile("!prod")
@@ -36,6 +27,7 @@ import static scala.collection.JavaConverters.*;
 public class DevTestNewsService {
     private final NewsDataService newsDataService;
     private final RestTemplate restTemplate;
+    private final NewsAnalysisService newsAnalysisService;
 
     @Value("${NAVER_CLIENT_ID}")
     private String clientId;
@@ -55,19 +47,19 @@ public class DevTestNewsService {
     @Value("${naver.base-url}")
     private String naverUrl;
 
-    public List<NaverNewsDto> testNewsDataService() {
-        List<String> newsKeywordsAfterAdd = List.of("AI", "사고");
+    public List<RealNewsDto> testNewsDataService() {
+        List<String> newsKeywordsAfterAdd = List.of("AI");
         List<NaverNewsDto> newsAfterRemoveDup = newsDataService.collectMetaDataFromNaver(newsKeywordsAfterAdd);
 
-//        List<RealNewsDto> newsAfterCrwal = newsDataService.createRealNewsDtoByCrawl(newsAfterRemoveDup);
-//
-//        List<AnalyzedNewsDto> newsAfterFilter = newsAnalysisService.filterAndScoreNews(newsAfterCrwal);
-//
-//        List<RealNewsDto> selectedNews = newsDataService.selectNewsByScore(newsAfterFilter);
-//
-//        List<RealNewsDto> savedNews = newsDataService.saveAllRealNews(selectedNews);
+        List<RealNewsDto> newsAfterCrwal = newsDataService.createRealNewsDtoByCrawl(newsAfterRemoveDup);
 
-        return newsAfterRemoveDup;
+        List<AnalyzedNewsDto> newsAfterFilter = newsAnalysisService.filterAndScoreNews(newsAfterCrwal);
+
+        List<RealNewsDto> selectedNews = newsDataService.selectNewsByScore(newsAfterFilter);
+
+        List<RealNewsDto> savedNews = newsDataService.saveAllRealNews(selectedNews);
+
+        return savedNews;
     }
 
     public List<NaverNewsDto> fetchNews(String query) {

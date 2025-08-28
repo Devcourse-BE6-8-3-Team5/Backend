@@ -24,10 +24,12 @@ public class DevTestController {
     private final RealNewsService realNewsService;
     private final RealNewsRepository realNewsRepository;
 
-    @GetMapping("/news")
-    public RsData<List<NaverNewsDto>> testCreateNews(){
 
-        List<NaverNewsDto> testNews;
+
+    @GetMapping("/news")
+    public RsData<List<RealNewsDto>> testCreateNews(){
+
+        List<RealNewsDto> testNews;
 
         try{
             testNews =  devTestNewsService.testNewsDataService();
