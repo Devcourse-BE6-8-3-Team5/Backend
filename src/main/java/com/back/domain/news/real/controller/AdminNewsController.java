@@ -14,7 +14,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.hibernate.dialect.OracleXmlJdbcType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -148,11 +147,6 @@ public class AdminNewsController {
         }
 
         Optional<RealNewsDto> realNewsDto = realNewsService.getRealNewsDtoById(newsId);
-
-        if (realNewsDto.isEmpty()) {
-            return RsData.of(404,
-                    String.format("ID %d에 해당하는 뉴스를 찾을 수 없습니다. 올바른 뉴스 ID인지 확인해주세요.", newsId));
-        }
 
         return newsPageService.getSingleNews(realNewsDto, NewsType.REAL, newsId);
     }
