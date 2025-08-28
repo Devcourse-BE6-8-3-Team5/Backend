@@ -15,7 +15,6 @@ import com.back.global.ai.processor.NewsAnalysisProcessor
 import com.back.global.exception.ServiceException
 import com.back.global.rateLimiter.RateLimiter
 import com.back.global.util.HtmlEntityDecoder
-import com.back.standard.extensions.getOrThrow
 import com.fasterxml.jackson.core.JsonProcessingException
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -47,7 +46,6 @@ import java.util.Set
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.ExecutionException
 import java.util.function.Function
-import java.util.function.Supplier
 import java.util.stream.Collectors
 import java.util.stream.Stream
 
@@ -458,38 +456,37 @@ class NewsDataService(
 
     @Transactional
     fun setTodayNews(id: Long) {
-        val realNews = realNewsRepository.findById(id).getOrThrow<IllegalArgumentException>()
-        (Supplier { IllegalArgumentException("해당 ID의 뉴스가 존재하지 않습니다. ID: " + id) })
+        val realNews = realNewsRepository.findById(id).orElseThrow { IllegalArgumentException("해당 ID의 뉴스가 존재하지 않습니다. ID: ${id}") }
+
 
         val today = LocalDate.now(ZoneId.of("Asia/Seoul"))
         todayNewsRepository!!.deleteBySelectedDate(today)
 
-        // 5. 새로운 오늘의 뉴스 생성
-        val todayNews = TodayNews.builder()
-            .selectedDate(today)
-            .realNews(realNews)
-            .build()
+        val todayNews = TodayNew(
+             selectedDate = today,
+             realNews = realNews
+        )
 
-        todayNewsRepository.save<TodayNews?>(todayNews)
+        val savedTodayNews = todayNewsRepository.save(todayNews)
 
-        publisher!!.publishEvent(TodayNewsCreatedEvent(todayNews.getId()))
+        publisher.publishEvent(TodayNewsCreatedEvent(savedTodayNews.id))
     }
 
     fun count(): Int {
         return realNewsRepository!!.count().toInt()
     }
 
-    fun selectNewsByScore(allRealNewsAfterFilter: MutableList<AnalyzedNewsDto?>): MutableList<RealNewsDto?> {
+    fun selectNewsByScore(allRealNewsAfterFilter: MutableList<AnalyzedNewsDto>): MutableList<RealNewsDto> {
         return allRealNewsAfterFilter.stream()
             .collect(Collectors.groupingBy(AnalyzedNewsDto::category))
             .values
             .stream()
-            .flatMap<AnalyzedNewsDto?> { categoryNews: MutableList<AnalyzedNewsDto?>? ->
+            .flatMap { categoryNews: MutableList<AnalyzedNewsDto> ->
                 categoryNews!!.stream()
-                    .sorted(Comparator.comparing<AnalyzedNewsDto?, Int?>(AnalyzedNewsDto::score).reversed())
+                    .sorted(Comparator.comparing(AnalyzedNewsDto::score).reversed())
                     .limit(4)
             }
-            .map<RealNewsDto?>(AnalyzedNewsDto::realNewsDto)
+            .map(AnalyzedNewsDto::realNewsDto)
             .toList()
     }
 
