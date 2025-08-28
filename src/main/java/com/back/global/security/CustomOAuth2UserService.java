@@ -53,7 +53,7 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
         String email = oauthUserId + "@" + providerTypeCode.toLowerCase() + ".com";
 
-        Member member = memberService.modifyOrJoin(oauthUserId, email, nickname).data();
+        Member member = memberService.modifyOrJoin(oauthUserId, email, nickname).data;
 
         // securityContext
         return new SecurityUser(

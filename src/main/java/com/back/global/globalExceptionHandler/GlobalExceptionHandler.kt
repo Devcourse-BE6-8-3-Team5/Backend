@@ -26,7 +26,7 @@ import java.io.IOException
 class GlobalExceptionHandler {
     // ServiceException: 서비스 계층에서 발생하는 커스텀 예외
     @ExceptionHandler(ServiceException::class)
-    fun handle(ex: ServiceException): ResponseEntity<RsData<Void>> {
+    fun handle(ex: ServiceException): ResponseEntity<RsData<Void?>> {
         val rsData = ex.rsData
         val statusCode = rsData.code
         val status = HttpStatus.resolve(statusCode) ?: HttpStatus.INTERNAL_SERVER_ERROR
@@ -36,8 +36,8 @@ class GlobalExceptionHandler {
 
     // NoSuchElementException: 데이터 없을떄 예외
     @ExceptionHandler(NoSuchElementException::class)
-    fun handle(ex: NoSuchElementException): ResponseEntity<RsData<Void>> {
-        return ResponseEntity<RsData<Void>>(
+    fun handle(ex: NoSuchElementException): ResponseEntity<RsData<Void?>> {
+        return ResponseEntity(
             RsData.of(
                 404,
                 "해당 데이터가 존재하지 않습니다"
@@ -48,7 +48,7 @@ class GlobalExceptionHandler {
 
     //ConstraintViolationException: 제약 조건(@NotNull, @Size 등)을 어겼을 때 발생예외
     @ExceptionHandler(ConstraintViolationException::class)
-    fun handle(ex: ConstraintViolationException): ResponseEntity<RsData<Void>> {
+    fun handle(ex: ConstraintViolationException): ResponseEntity<RsData<Void?>> {
         //메세지 형식 : <필드명>-<검증어노테이션명>-<검증실패메시지>
         val message = ex.constraintViolations
             .map { violation ->
@@ -64,7 +64,7 @@ class GlobalExceptionHandler {
             .sorted()
             .joinToString("\n") { it }
 
-        return ResponseEntity<RsData<Void>>(
+        return ResponseEntity(
             RsData.of(
                 400,
                 message
@@ -76,7 +76,7 @@ class GlobalExceptionHandler {
 
     // MethodArgumentNotValidException: @Valid 어노테이션을 사용한 유효성 검사 실패시 발생하는 예외
     @ExceptionHandler(MethodArgumentNotValidException::class)
-    fun handle(ex: MethodArgumentNotValidException): ResponseEntity<RsData<Void>> {
+    fun handle(ex: MethodArgumentNotValidException): ResponseEntity<RsData<Void?>> {
         //메세지 형식 : <필드명>-<검증어노테이션명>-<검증실패메시지>
         val message = ex.bindingResult
             .allErrors
@@ -97,7 +97,7 @@ class GlobalExceptionHandler {
 
     // HttpMessageNotReadableException : 요청 본문이 올바르지 않을 때 발생하는 예외
     @ExceptionHandler(HttpMessageNotReadableException::class)
-    fun handle(ex: HttpMessageNotReadableException?): ResponseEntity<RsData<Void>> {
+    fun handle(ex: HttpMessageNotReadableException?): ResponseEntity<RsData<Void?>> {
         return ResponseEntity(
             RsData.of(
                 400,
@@ -109,7 +109,7 @@ class GlobalExceptionHandler {
 
     // MissingRequestHeaderException : 필수 요청 헤더가 누락되었을 때 발생하는 예외
     @ExceptionHandler(MissingRequestHeaderException::class)
-    fun handle(ex: MissingRequestHeaderException): ResponseEntity<RsData<Void>> {
+    fun handle(ex: MissingRequestHeaderException): ResponseEntity<RsData<Void?>> {
         // 메세지 형식 : <필드명>-<검증어노테이션명>-<검증실패메시지>
         val message = "${ex.headerName}-NotBlank-${ex.localizedMessage}"
 
@@ -123,13 +123,13 @@ class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(JsonProcessingException::class)
-    fun handleJsonProcessingException(e: JsonProcessingException): ResponseEntity<RsData<Void>> {
+    fun handleJsonProcessingException(e: JsonProcessingException): ResponseEntity<RsData<Void?>> {
         return ResponseEntity.badRequest()
             .body(RsData.of(400, "JSON 파싱 오류가 발생했습니다.", null))
     }
 
     @ExceptionHandler(IOException::class)
-    fun handleIOException(e: IOException): ResponseEntity<RsData<Void>> {
+    fun handleIOException(e: IOException): ResponseEntity<RsData<Void?>> {
         return ResponseEntity.internalServerError()
             .body(RsData.of(500, "서버 내부 오류가 발생했습니다.", null))
     }

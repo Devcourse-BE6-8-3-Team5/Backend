@@ -12,6 +12,6 @@ import com.back.global.rsData.RsData
 class ServiceException(private val code: Int, private val msg: String) :
     RuntimeException("$code : $msg") {
 
-    val rsData: RsData<Void>
+    val rsData: RsData<Void?>
         get() = RsData.of(code, msg)
 }

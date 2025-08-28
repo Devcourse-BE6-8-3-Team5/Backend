@@ -11,6 +11,6 @@ import org.springframework.web.bind.annotation.RestController
 class HealthController {
     @GetMapping("/health")
     @Operation(summary = "헬스체크 API")
-    fun health(): RsData<Void> = RsData.of<Void>(200, "서버가 정상 작동 중입니다.")
+    fun health(): RsData<Void?> = RsData.of(200, "서버가 정상 작동 중입니다.")
 
 }
