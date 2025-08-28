@@ -36,7 +36,7 @@ class GlobalExceptionHandler {
 
     // NoSuchElementException: 데이터 없을떄 예외
     @ExceptionHandler(NoSuchElementException::class)
-    fun handle(ex: NoSuchElementException?): ResponseEntity<RsData<Void>> {
+    fun handle(ex: NoSuchElementException): ResponseEntity<RsData<Void>> {
         return ResponseEntity<RsData<Void>>(
             RsData.of(
                 404,
