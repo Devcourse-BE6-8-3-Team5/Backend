@@ -6,7 +6,6 @@ import com.back.domain.news.common.service.NewsPageService;
 import com.back.domain.news.real.dto.RealNewsDto;
 import com.back.domain.news.real.service.NewsDataService;
 import com.back.domain.news.real.service.RealNewsService;
-import com.back.domain.news.today.entity.TodayNews;
 import com.back.global.rsData.RsData;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -20,7 +19,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.Optional;
 
 @Tag(name = "RealNewsController", description = "Real News API")
@@ -57,12 +55,7 @@ public class RealNewsController {
         }
 
         Optional<RealNewsDto> realNewsDto = realNewsService.getRealNewsDtoById(newsId);
-
-        if (realNewsDto.isEmpty()) {
-            return RsData.of(404,
-                    String.format("ID %d에 해당하는 뉴스를 찾을 수 없습니다. 올바른 뉴스 ID인지 확인해주세요.", newsId));
-        }
-
+        
         return newsPageService.getSingleNews(realNewsDto, NewsType.REAL, newsId);
     }
 
