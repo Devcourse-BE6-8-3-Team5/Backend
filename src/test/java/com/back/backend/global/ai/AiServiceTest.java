@@ -65,7 +65,7 @@ public class AiServiceTest {
         );
 
         // when
-        List<DetailQuizDto> result = aiService.process(processor);
+        List<DetailQuizDto> result = (List<DetailQuizDto>) aiService.process(processor);
 
         // then
         System.out.println(result);
