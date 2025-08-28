@@ -191,7 +191,7 @@ class TestInitData(
             NewsCategory.CULTURE
         )
 
-        val newsList = listOf<RealNewsDto>(news1, news2, news3, news4, news5, news6, news7, news8)
+        val newsList = mutableListOf(news1, news2, news3, news4, news5, news6, news7, news8)
         val savedNewsList = newsDataService.saveAllRealNews(newsList)
 
         if (!savedNewsList.isEmpty()) {

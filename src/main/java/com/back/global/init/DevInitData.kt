@@ -382,7 +382,7 @@ class DevInitData(
         )
 
 
-        val newsList = listOf(
+        val newsList = mutableListOf(
             news1,
             news2,
             news3,
