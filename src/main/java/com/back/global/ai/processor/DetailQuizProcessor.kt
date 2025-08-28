@@ -1,29 +1,21 @@
-package com.back.global.ai.processor;
+package com.back.global.ai.processor
 
-import com.back.domain.quiz.detail.dto.DetailQuizDto;
-import com.back.domain.quiz.detail.dto.DetailQuizCreateReqDto;
-import com.back.global.exception.ServiceException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.ai.chat.model.ChatResponse;
-
-import java.util.List;
+import com.back.domain.quiz.detail.dto.DetailQuizCreateReqDto
+import com.back.domain.quiz.detail.dto.DetailQuizDto
+import com.back.global.exception.ServiceException
+import com.fasterxml.jackson.databind.ObjectMapper
+import org.springframework.ai.chat.model.ChatResponse
 
 /**
  * 뉴스 제목과 본문을 기반 상세 퀴즈 3개를 생성하는 AI 요청 Processor 입니다.
  */
-public class DetailQuizProcessor implements AiRequestProcessor<List<DetailQuizDto>> {
-    private final DetailQuizCreateReqDto req;
-    private final ObjectMapper objectMapper;
-
-    public DetailQuizProcessor(DetailQuizCreateReqDto req, ObjectMapper objectMapper) {
-        this.req = req;
-        this.objectMapper = objectMapper;
-    }
-
+class DetailQuizProcessor(
+    private val req: DetailQuizCreateReqDto,
+    private val objectMapper: ObjectMapper
+) : AiRequestProcessor<List<DetailQuizDto>> {
     // 뉴스 제목과 본문을 바탕으로 퀴즈 생성용 프롬프트 생성 (응답 형식을 JSON 형식으로 작성)
-    @Override
-    public String buildPrompt() {
-        return String.format("""
+    override fun buildPrompt(): String {
+        return """
                 Task: 아래 뉴스 제목과 본문을 바탕으로 객관식 퀴즈 3개를 생성하세요.
                 
                 [퀴즈 목적]
@@ -78,42 +70,34 @@ public class DetailQuizProcessor implements AiRequestProcessor<List<DetailQuizDt
                 
                 input:
                 {
-                    "title": "%s",
-                    "content": "%s"
+                    "title": "${req.title}",
+                    "content": "${req.content}"
                 }
-                """, req.title(), req.content());
+                
+                """.trimIndent()
     }
 
     // AI 응답을 파싱하여 DetailQuizResDto 리스트로 변환
-    @Override
-    public List<DetailQuizDto> parseResponse(ChatResponse response) {
-
-        String text = response.getResult().getOutput().getText();
-        if (text == null || text.trim().isEmpty()) {
-            throw new ServiceException(500, "AI 응답이 비어있습니다");
-        }
-
-        List<DetailQuizDto> result;
+    override fun parseResponse(response: ChatResponse): List<DetailQuizDto> {
+        val text = response.result.output.text?.takeIf { it.isNotBlank() }
+            ?: throw ServiceException(500, "AI 응답이 비어있습니다")
 
         // JSON 형식의 응답에서 ```json ... ``` 부분을 제거하여 순수 JSON 문자열로 변환
-        String cleanedJson = text.replaceAll("(?s)```json\\s*(.*?)\\s*```", "$1").trim();
+        val cleanedJson = text.replace("(?s)```json\\s*(.*?)\\s*```".toRegex(), "$1").trim()
 
-        try {
-            // JSON 문자열을 DetailQuizResDto 객체 리스트로 변환
-            // JSON의 키 이름과 변환하려는 객체(DetailQuizResDto)의 필드 이름이 일치해야 합니다.
-            result = objectMapper.readValue(
-                    cleanedJson,
-                    objectMapper.getTypeFactory().constructCollectionType(List.class, DetailQuizDto.class)
-            );
-        } catch (Exception e) {
-            throw new ServiceException(500, "AI 응답이 JSON 형식이 아닙니다. 응답: " + text);
+        val result: List<DetailQuizDto> = try {
+            objectMapper.readValue(
+                cleanedJson,
+                objectMapper.typeFactory.constructCollectionType(MutableList::class.java, DetailQuizDto::class.java)
+            )
+        } catch (e: Exception) {
+            throw ServiceException(500, "AI 응답이 JSON 형식이 아닙니다. 응답: $text")
         }
 
-        if (result.size() != 3) {
-            throw new ServiceException(500, "뉴스 하나당 3개의 퀴즈가 생성되어야 합니다. 생성된 수: " + result.size());
+        if (result.size != 3) {
+            throw ServiceException(500, "뉴스 하나당 3개의 퀴즈가 생성되어야 합니다. 생성된 수: ${result.size}")
         }
 
-        return result;
-
+        return result
     }
 }
