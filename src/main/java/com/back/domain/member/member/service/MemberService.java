@@ -31,16 +31,17 @@ public class MemberService {
             role = "ADMIN"; // 관리자 권한 설정
         }
 
-        Member member = Member.builder()
-                .name(name)
-                .password(encodedPassword)
-                .email(email)
-                .exp(0)
-                .level(1)
-                .role(role) //기본 권한 USER. 관리자면 "ADMIN"으로 설정하시면 됩니다
-                .apiKey(UUID.randomUUID().toString())
-                .oauthId(null)
-                .build();
+
+        Member member = new Member(
+                name,
+                email,
+                encodedPassword,
+                0,
+                1,
+                role,
+                UUID.randomUUID().toString(),
+                null
+        );
 
         return memberRepository.save(member);
     }
@@ -68,16 +69,17 @@ public class MemberService {
                     throw new ServiceException(409, "이미 존재하는 계정입니다.");
                 });
         String encodedPassword = passwordEncoder.encode("1234");
-        Member member = Member.builder()
-                .name(nickname)
-                .password(encodedPassword) // null이면 안돼서 임의로 1234
-                .email(email)
-                .exp(0)
-                .level(1)
-                .role("USER") //기본 권한 USER. 관리자면 "ADMIN"으로 설정하시면 됩니다
-                .apiKey(UUID.randomUUID().toString())
-                .oauthId(oauthId)
-                .build();
+
+        Member member = new Member(
+                nickname,
+                email,
+                encodedPassword,
+                0,
+                1,
+                "USER",
+                UUID.randomUUID().toString(),
+                oauthId
+        );
 
         return memberRepository.save(member);
     }
