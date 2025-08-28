@@ -105,6 +105,7 @@ public class DetailQuiz {
         return correctOption;
     }
 
+    @JsonIgnore
     public RealNews getRealNews() {
         return realNews;
     }
@@ -113,6 +114,7 @@ public class DetailQuiz {
         return quizType;
     }
 
+    @JsonIgnore
     public DailyQuiz getDailyQuiz() {
         return dailyQuiz;
     }
