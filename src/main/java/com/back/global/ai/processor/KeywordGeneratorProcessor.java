@@ -156,9 +156,9 @@ public class KeywordGeneratorProcessor implements AiRequestProcessor<KeywordGene
                 }
                 ```
                 """,
-                keywordGenerationReqDto.currentDate(),
-                keywordGenerationReqDto.recentKeywordsWithTypes(),
-                keywordGenerationReqDto.excludeKeywords());
+                keywordGenerationReqDto.currentDate,
+                keywordGenerationReqDto.recentKeywordsWithTypes,
+                keywordGenerationReqDto.excludeKeywords);
 
     }
 
@@ -226,11 +226,11 @@ public class KeywordGeneratorProcessor implements AiRequestProcessor<KeywordGene
     }
 
     private void validatekeywords(KeywordGenerationResDto result) {
-        if(result.society()== null || result.society().size() != 2 ||
-           result.economy() == null || result.economy().size() != 2 ||
-           result.politics() == null || result.politics().size() != 2 ||
-           result.culture() == null || result.culture().size() != 2 ||
-           result.it() == null || result.it().size() != 2) {
+        if(result.society == null || result.society.size() != 2 ||
+           result.economy == null || result.economy.size() != 2 ||
+           result.politics == null || result.politics.size() != 2 ||
+           result.culture == null || result.culture.size() != 2 ||
+           result.it == null || result.it.size() != 2) {
             throw new ServiceException(500, "각 카테고리당 정확히 2개의 키워드가 필요합니다.");
         }
     }

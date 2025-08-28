@@ -30,11 +30,11 @@ public class KeywordHistoryService {
     public void saveKeywords(KeywordGenerationResDto keywords, LocalDate usedDate){
 
         // Save each keyword category to the repository
-        saveKeywordsByCategory(keywords.society(), NewsCategory.SOCIETY, usedDate);
-        saveKeywordsByCategory(keywords.economy(), NewsCategory.ECONOMY, usedDate);
-        saveKeywordsByCategory(keywords.politics(), NewsCategory.POLITICS, usedDate);
-        saveKeywordsByCategory(keywords.culture(), NewsCategory.CULTURE, usedDate);
-        saveKeywordsByCategory(keywords.it(), NewsCategory.IT, usedDate);
+        saveKeywordsByCategory(keywords.society, NewsCategory.SOCIETY, usedDate);
+        saveKeywordsByCategory(keywords.economy, NewsCategory.ECONOMY, usedDate);
+        saveKeywordsByCategory(keywords.politics, NewsCategory.POLITICS, usedDate);
+        saveKeywordsByCategory(keywords.culture, NewsCategory.CULTURE, usedDate);
+        saveKeywordsByCategory(keywords.it, NewsCategory.IT, usedDate);
 
     }
 
@@ -60,14 +60,14 @@ public class KeywordHistoryService {
         // 4. 처리할 데이터 준비
         List<KeywordHistory> keywordHistories = new ArrayList<>();
         for (KeywordWithType keyword : keywords) {
-            KeywordHistory existing = existingMap.get(keyword.keyword());
+            KeywordHistory existing = existingMap.get(keyword.keyword);
             if (existing != null) {
                 existing.incrementUseCount();
                 keywordHistories.add(existing);
             } else {
                 keywordHistories.add(KeywordHistory.builder()
-                        .keyword(keyword.keyword())
-                        .keywordType(keyword.keywordType())
+                        .keyword(keyword.keyword)
+                        .keywordType(keyword.keywordType)
                         .category(category)
                         .usedDate(usedDate)
                         .build());

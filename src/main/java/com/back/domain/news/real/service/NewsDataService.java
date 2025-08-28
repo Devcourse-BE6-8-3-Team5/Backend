@@ -494,15 +494,15 @@ public class NewsDataService {
 
     public List<RealNewsDto> selectNewsByScore(List<AnalyzedNewsDto> allRealNewsAfterFilter) {
         return allRealNewsAfterFilter.stream()
-                .collect(Collectors.groupingBy(AnalyzedNewsDto::category))
+                .collect(Collectors.groupingBy(AnalyzedNewsDto::getCategory))
                 .values()
                 .stream()
                 .flatMap(categoryNews ->
                         categoryNews.stream()
-                                .sorted(Comparator.comparing(AnalyzedNewsDto::score).reversed())
+                                .sorted(Comparator.comparing(AnalyzedNewsDto::getScore).reversed())
                                 .limit(4)
                 )
-                .map(AnalyzedNewsDto::realNewsDto)
+                .map(AnalyzedNewsDto::getRealNewsDto)
                 .toList();
     }
 
