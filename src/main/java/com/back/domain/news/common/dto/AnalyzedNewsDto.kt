@@ -7,12 +7,11 @@ data class AnalyzedNewsDto(
     val realNewsDto: RealNewsDto,
     val score: Int,
     val category: NewsCategory
-)
-    // {
-//    companion object {
-//        fun of(realNewsDto: RealNewsDto?, score: Int?, category: NewsCategory?): AnalyzedNewsDto {
-//            return AnalyzedNewsDto(realNewsDto, score, category)
-//        }
-//    }
-//}
+) {
+    constructor(dto: AnalyzedNewsDto) : this(
+        realNewsDto = RealNewsDto(dto),
+        score = dto.score,
+        category = dto.category
+    )
+}
 

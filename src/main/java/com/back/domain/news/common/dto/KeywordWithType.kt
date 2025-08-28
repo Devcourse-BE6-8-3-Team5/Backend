@@ -7,6 +7,6 @@ import jakarta.persistence.Enumerated
 
 @Embeddable
 data class KeywordWithType(
-        val keyword: String?,
+        val keyword: String,
         @field:Enumerated(EnumType.STRING) val keywordType: KeywordType
 )

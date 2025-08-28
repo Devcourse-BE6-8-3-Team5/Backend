@@ -1,24 +1,15 @@
 package com.back.domain.news.common.dto
 
-import java.util.stream.Stream
-
 
 data class KeywordGenerationResDto(
-    @JvmField val society: MutableList<KeywordWithType?>?,
-    @JvmField val economy: MutableList<KeywordWithType?>?,
-    @JvmField val politics: MutableList<KeywordWithType?>?,
-    @JvmField val culture: MutableList<KeywordWithType?>?,
-    @JvmField val it: MutableList<KeywordWithType?>?
+    val society: List<KeywordWithType>,
+    val economy: List<KeywordWithType>,
+    val politics: List<KeywordWithType>,
+    val culture: List<KeywordWithType>,
+    val it: List<KeywordWithType>
 ) {
-    val keywords: MutableList<String?>
-        get() = Stream.of<MutableList<KeywordWithType?>?>(
-            society,
-            economy,
-            politics,
-            culture,
-            it
-        )
-            .flatMap<KeywordWithType?> { obj: MutableList<KeywordWithType?>? -> obj!!.stream() }
-            .map<String?>(KeywordWithType::keyword)
-            .toList()
+    val keywords: List<String>
+        get() = listOf(society, economy, politics, culture, it)
+            .flatten()
+            .map { it.keyword }
 }
