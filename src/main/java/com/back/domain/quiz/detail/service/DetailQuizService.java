@@ -107,7 +107,7 @@ public class DetailQuizService {
 
         DetailQuizProcessor processor = new DetailQuizProcessor(req, objectMapper);
 
-        return aiService.process(processor);
+        return (List<DetailQuizDto>) aiService.process(processor);
     }
 
     // 생성한 퀴즈 DB에 저장
