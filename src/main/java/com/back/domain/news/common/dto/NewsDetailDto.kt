@@ -6,21 +6,11 @@ data class NewsDetailDto(
     val imgUrl: String,  // 이미지 URL
     val journalist: String,  // 기자명
     val mediaName: String // 언론사명
-)
-//{
-//    companion object {
-//        @JvmStatic
-//        fun of(content: String?, imgUrl: String?, journalist: String?, mediaName: String?): NewsDetailDto {
-//            return NewsDetailDto(content, imgUrl, journalist, mediaName)
-//        }
-//
-//        fun from(item: JsonNode): NewsDetailDto {
-//            return NewsDetailDto(
-//                item.get("content").asText(""),
-//                item.get("imgUrl").asText(""),
-//                item.get("journalist").asText(""),
-//                item.get("mediaName").asText("")
-//            )
-//        }
-//    }
-//}
+) {
+    constructor(dto: NewsDetailDto): this(
+        content = dto.content,
+        imgUrl = dto.imgUrl,
+        journalist = dto.journalist,
+        mediaName = dto.mediaName
+    )
+}
