@@ -55,7 +55,11 @@ public class RealNewsController {
         }
 
         Optional<RealNewsDto> realNewsDto = realNewsService.getRealNewsDtoById(newsId);
+<<<<<<< HEAD
 
+=======
+        
+>>>>>>> 2ac54512bc77893ce7984e34249b5588da62855b
         return newsPageService.getSingleNews(realNewsDto, NewsType.REAL, newsId);
     }
 

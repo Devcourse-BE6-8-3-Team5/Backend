@@ -5,4 +5,5 @@ enum class KeywordType {
     ONGOING,  // 진행중
     GENERAL,  // 일반
     SEASONAL  // 시즌성
+
 }

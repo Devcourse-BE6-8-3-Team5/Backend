@@ -49,7 +49,6 @@ public class Member {
     @Column(nullable = false, unique = true)
     private String apiKey; // 리프레시 토큰
 
-    
 
     @Column(unique = true, nullable = true)
     private String oauthId; // 소셜 로그인용 고유 oauthId
@@ -96,5 +95,8 @@ public class Member {
                 .toList();
     }
 
-    
+    // Rq 코틀린 클래스에서 롬복 getter에 접근할 수 없어서 임시로 만든 메서드입니다.
+    public long getId() {
+        return id;
+    }
 }
