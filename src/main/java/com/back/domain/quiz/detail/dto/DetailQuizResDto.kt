@@ -4,7 +4,7 @@ import com.back.domain.quiz.detail.entity.DetailQuiz
 import com.back.domain.quiz.detail.entity.Option
 
 data class DetailQuizResDto(
-    val id: Long,
+    val id: Long?,
     val question: String,
     val option1: String,
     val option2: String,
