@@ -2,9 +2,6 @@ package com.back.global.ai.processor
 
 import com.back.domain.news.fake.dto.FakeNewsDto
 import com.back.domain.news.real.dto.RealNewsDto
-import com.back.global.exception.ServiceException
-import com.fasterxml.jackson.annotation.JsonProperty
-import com.fasterxml.jackson.core.JsonProcessingException
 import com.fasterxml.jackson.databind.ObjectMapper
 import lombok.extern.slf4j.Slf4j
 import org.slf4j.LoggerFactory
@@ -139,77 +136,58 @@ class FakeNewsGeneratorProcessor(
 
     // AI 응답을 파싱하여 FakeNewsDto로 변환
     override fun parseResponse(response: ChatResponse): FakeNewsDto {
-        val text = response.getResult().output.text
-        if (text == null || text.trim { it <= ' ' }.isEmpty()) {
-            throw ServiceException(500, "AI 응답이 비어있습니다")
-        }
+        val text = response.result?.output?.text?.takeIf { it.isNotBlank() }
+            ?: return createFailureNotice("AI 응답이 비어있습니다")
 
-        try {
-            val cleanedJson = cleanResponse(text)
-            val result: FakeNewsGeneratedRes =
-                objectMapper.readValue(cleanedJson, FakeNewsGeneratedRes::class.java)
+        val cleanedJson = cleanResponse(text)
+        log.debug(">>> 원본 응답\n{}", text)
+        log.debug(">>> 정리 후 JSON\n{}", cleanedJson)
 
-            return convertToFakeNewsDto(result)
-        } catch (e: JsonProcessingException) {
+        return runCatching {
+            // JsonNode를 사용한 안전한 파싱
+            val jsonNode = objectMapper.readTree(cleanedJson)
+            val contentNode = jsonNode.get("content")
+
+            val content = when {
+                contentNode == null -> null
+                contentNode.isNull -> null
+                else -> contentNode.asText()
+            }
+
+            if (content.isNullOrBlank()) {
+                createFailureNotice("AI 응답에 content가 누락되었습니다")
+            } else {
+                FakeNewsDto.of(realNewsDto.id, content)
+            }
+        }.getOrElse { e ->
             log.error("JSON 파싱 실패: {}", e.message)
-            return createFailureNotice()
-        } catch (e: IllegalArgumentException) {
-            log.error("데이터 변환 실패: {}", e.message)
-            return createFailureNotice()
-        } catch (e: Exception) {
-            log.error("예상치 못한 오류: {}", e.message)
-            return createFailureNotice()
+            log.error("파싱 시도한 JSON: {}", cleanedJson)
+            e.printStackTrace()
+            createFailureNotice("AI 응답 파싱 실패: ${e.message}")
         }
     }
 
-    private fun createFailureNotice(): FakeNewsDto {
-        val failureContent = String.format(
-            "이 뉴스는 AI 생성에 실패하여 자동으로 생성된 안내문입니다. " +
-                    "AI 시스템에서 해당 뉴스의 가짜 버전을 생성하는 중 기술적 오류가 발생했습니다. " +
-                    "시스템 관리자에게 문의하시거나 나중에 다시 시도해 주세요."
-        )
+    private fun createFailureNotice(reason: String): FakeNewsDto {
+        val failureContent = """
+            이 뉴스는 AI 생성에 실패하여 안내문으로 대체되었습니다.
+            원인: $reason
+            시스템 관리자에게 문의하거나 나중에 다시 시도해 주세요.
+        """.trimIndent()
 
         return FakeNewsDto.of(realNewsDto.id, failureContent)
     }
 
-    /**
-     * AI 응답 정리 - 마크다운 코드 블록만 제거
-     */
-    private fun cleanResponse(text: String): String {
-        log.debug("=== AI 원본 응답 ===")
-        log.debug("{}", text)
 
+    private fun cleanResponse(text: String): String {
         return text.trim { it <= ' ' }
             .replace("(?s)```json\\s*(.*?)\\s*```".toRegex(), "$1")
             .replace("```".toRegex(), "")
             .trim { it <= ' ' }
     }
 
-    /**
-     * 프롬프트용 텍스트 정리
-     */
-    private fun cleanText(text: String?): String {
-        if (text == null) return ""
+    private fun cleanText(text: String): String {
         return text.replace("\"", "'")
             .replace("%", "%%") // % -> %% 이스케이프
             .trim { it <= ' ' }
     }
-
-    /**
-     * 결과를 FakeNewsDto로 변환
-     */
-    private fun convertToFakeNewsDto(result: FakeNewsGeneratedRes): FakeNewsDto {
-        if (result.content.trim { it <= ' ' }.isEmpty()) {
-            throw ServiceException(500, "AI 응답에 content가 누락되었습니다")
-        }
-
-        return FakeNewsDto.of(realNewsDto.id, result.content)
-    }
-
-    /**
-     * AI 응답 파싱용 내부 레코드
-     */
-    private data class FakeNewsGeneratedRes(
-        @field:JsonProperty("content") val content: String
-    )
 }
