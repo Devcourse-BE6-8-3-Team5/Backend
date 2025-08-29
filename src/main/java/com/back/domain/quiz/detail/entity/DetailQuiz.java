@@ -74,11 +74,11 @@ public class DetailQuiz {
     }
 
     public DetailQuiz(DetailQuizDto detailQuizDto) {
-        this.question = detailQuizDto.question();
-        this.option1 = detailQuizDto.option1();
-        this.option2 = detailQuizDto.option2();
-        this.option3 = detailQuizDto.option3();
-        this.correctOption = detailQuizDto.correctOption();
+        this.question = detailQuizDto.getQuestion();
+        this.option1 = detailQuizDto.getOption1();
+        this.option2 = detailQuizDto.getOption2();
+        this.option3 = detailQuizDto.getOption3();
+        this.correctOption = detailQuizDto.getCorrectOption();
     }
 
     public Long getId() {
