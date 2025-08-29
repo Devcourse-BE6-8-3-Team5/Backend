@@ -12,7 +12,6 @@ import java.util.List;
 import static jakarta.persistence.CascadeType.ALL;
 
 @Entity
-@Getter
 @NoArgsConstructor
 @Builder
 @AllArgsConstructor
@@ -47,4 +46,21 @@ public class FakeNews {
     @JsonIgnore
     private List<FactQuiz> factQuizzes = new ArrayList<>();
 
+    public Long getId() {
+        return id;
+    }
+
+    @JsonIgnore
+    public RealNews getRealNews() {
+        return realNews;
+    }
+
+    public String getContent() {
+        return content;
+    }
+
+    @JsonIgnore
+    public List<FactQuiz> getFactQuizzes() {
+        return factQuizzes;
+    }
 }
