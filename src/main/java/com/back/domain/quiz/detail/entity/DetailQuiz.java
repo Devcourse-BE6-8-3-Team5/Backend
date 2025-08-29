@@ -8,12 +8,10 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Getter
 @Setter
 @NoArgsConstructor
 public class DetailQuiz {
@@ -83,4 +81,41 @@ public class DetailQuiz {
         this.correctOption = detailQuizDto.correctOption();
     }
 
+    public Long getId() {
+        return id;
+    }
+
+    public String getQuestion() {
+        return question;
+    }
+
+    public String getOption1() {
+        return option1;
+    }
+
+    public String getOption2() {
+        return option2;
+    }
+
+    public String getOption3() {
+        return option3;
+    }
+
+    public Option getCorrectOption() {
+        return correctOption;
+    }
+
+    @JsonIgnore
+    public RealNews getRealNews() {
+        return realNews;
+    }
+
+    public QuizType getQuizType() {
+        return quizType;
+    }
+
+    @JsonIgnore
+    public DailyQuiz getDailyQuiz() {
+        return dailyQuiz;
+    }
 }
