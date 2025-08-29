@@ -78,7 +78,7 @@ public class DailyQuizControllerTest {
 
                 .andExpect(jsonPath("$.data[0].answer").doesNotExist())
                 .andExpect(jsonPath("$.data[0].gainExp").exists())
-                .andExpect(jsonPath("$.data[0].correct").exists())
+                .andExpect(jsonPath("$.data[0].isCorrect").exists())
                 .andExpect(jsonPath("$.data[0].quizType").value("DAILY"));
 
     }
@@ -121,7 +121,7 @@ public class DailyQuizControllerTest {
                 .andExpect(jsonPath("$.message").value("퀴즈 정답 제출 성공"))
                 .andExpect(jsonPath("$.data.quizId").value(quizId))
                 .andExpect(jsonPath("$.data.selectedOption").value("OPTION2"))
-                .andExpect(jsonPath("$.data.correct").value(true))
+                .andExpect(jsonPath("$.data.isCorrect").value(true))
                 .andExpect(jsonPath("$.data.gainExp").value(20))
                 .andExpect(jsonPath("$.data.quizType").value("DAILY"));
     }
@@ -146,7 +146,7 @@ public class DailyQuizControllerTest {
                 .andExpect(jsonPath("$.message").value("퀴즈 정답 제출 성공"))
                 .andExpect(jsonPath("$.data.quizId").value(quizId))
                 .andExpect(jsonPath("$.data.selectedOption").value("OPTION1"))
-                .andExpect(jsonPath("$.data.correct").value(false))
+                .andExpect(jsonPath("$.data.isCorrect").value(false))
                 .andExpect(jsonPath("$.data.gainExp").value(0))
                 .andExpect(jsonPath("$.data.quizType").value("DAILY"));
     }

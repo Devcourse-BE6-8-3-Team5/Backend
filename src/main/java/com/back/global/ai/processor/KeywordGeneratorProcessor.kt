@@ -158,7 +158,7 @@ class KeywordGeneratorProcessor(
         val cleanedJson = text.replace("(?s)```json\\s*(.*?)\\s*```".toRegex(), "$1").trim { it <= ' ' }
 
         try {
-            result = objectMapper.readValue<KeywordGenerationResDto>(
+            result = objectMapper.readValue(
                 cleanedJson,
                 KeywordGenerationResDto::class.java
             )
@@ -172,27 +172,27 @@ class KeywordGeneratorProcessor(
     }
 
     private fun createDefaultCase(): KeywordGenerationResDto {
-        val societyKeywords = listOf<KeywordWithType>(
+        val societyKeywords = listOf(
             KeywordWithType("사회", KeywordType.GENERAL),
             KeywordWithType("교육", KeywordType.GENERAL)
         )
 
-        val economyKeywords = listOf<KeywordWithType>(
+        val economyKeywords = listOf(
             KeywordWithType("경제", KeywordType.GENERAL),
             KeywordWithType("시장", KeywordType.GENERAL)
         )
 
-        val politicsKeywords = listOf<KeywordWithType>(
+        val politicsKeywords = listOf(
             KeywordWithType("정치", KeywordType.GENERAL),
             KeywordWithType("정부", KeywordType.GENERAL)
         )
 
-        val cultureKeywords = listOf<KeywordWithType>(
+        val cultureKeywords = listOf(
             KeywordWithType("문화", KeywordType.GENERAL),
             KeywordWithType("예술", KeywordType.GENERAL)
         )
 
-        val itKeywords = listOf<KeywordWithType>(
+        val itKeywords = listOf(
             KeywordWithType("기술", KeywordType.GENERAL),
             KeywordWithType("IT", KeywordType.GENERAL)
         )
@@ -207,7 +207,6 @@ class KeywordGeneratorProcessor(
     }
 
     private fun validateKeywords(result: KeywordGenerationResDto) {
-        result.keywords
         if (result.society.size != 2 || result.economy.size != 2 || result.politics.size != 2 || result.culture.size != 2 || result.it.size != 2) {
             throw ServiceException(500, "각 카테고리당 정확히 2개의 키워드가 필요합니다.")
         }

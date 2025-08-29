@@ -14,3 +14,4 @@ data class NewsDetailDto(
         mediaName = dto.mediaName
     )
 }
+
