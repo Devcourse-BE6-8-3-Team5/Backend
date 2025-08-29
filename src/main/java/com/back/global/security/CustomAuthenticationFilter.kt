@@ -23,7 +23,6 @@ class CustomAuthenticationFilter(
     private val rq: Rq,
 ) : OncePerRequestFilter() {
 
-    // 시작 경로로 체크할 공용 경로
     private val publicPaths = setOf(
         "/swagger-ui/",
         "/v3/api-docs/",
@@ -31,7 +30,6 @@ class CustomAuthenticationFilter(
         "/h2-console"
     )
 
-    // 정확히 일치하는 공용 경로
     private val publicExactPaths = setOf(
         "/api/news",
         "/api/members/rank",
@@ -41,7 +39,6 @@ class CustomAuthenticationFilter(
         "/api/members/join"
     )
 
-    // 인증이 필요한 정확한 경로
     private val authRequiredPaths = setOf(
         "/api/members/info",
         "/api/members/logout",
@@ -70,7 +67,6 @@ class CustomAuthenticationFilter(
             filterChain.doFilter(request, response)
             return
         }
-
         // 인증이 필요한 URL 체크
         if (!isAuthRequired(uri, method)) {
             filterChain.doFilter(request, response)
