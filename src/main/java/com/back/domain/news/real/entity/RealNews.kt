@@ -2,6 +2,7 @@ package com.back.domain.news.real.entity
 
 import com.back.domain.news.common.enums.NewsCategory
 import com.back.domain.news.fake.entity.FakeNews
+import com.back.domain.news.today.entity.TodayNews
 import com.back.domain.quiz.detail.entity.DetailQuiz
 import com.back.domain.quiz.fact.entity.FactQuiz
 import com.fasterxml.jackson.annotation.JsonIgnore
@@ -13,24 +14,16 @@ import java.time.LocalDateTime
 @Entity
 @Table(
     name = "real_news",
-    indexes = [Index(
-        name = "idx_real_news_category_created_date",
-        columnList = "news_category, created_date DESC"
-    ), Index(
-        name = "idx_real_news_created_date_desc",
-        columnList = "created_date DESC"
-    ), Index(
-        name = "idx_real_news_origin_created_date_desc",
-        columnList = "origin_created_date DESC"
-    ), Index(
-        name = "idx_real_news_category_origin_created_date_desc",
-        columnList = "news_category, origin_created_date DESC"
-    )]
+    indexes = [
+        Index(name = "idx_real_news_category_created_date",columnList = "news_category, created_date DESC"),
+        Index(name = "idx_real_news_created_date_desc",columnList = "created_date DESC"),
+        Index(name = "idx_real_news_origin_created_date_desc",columnList = "origin_created_date DESC"),
+        Index(name = "idx_real_news_category_origin_created_date_desc", columnList = "news_category, origin_created_date DESC")
+    ]
 )
 data class RealNews(
     @field:Lob
     val content: String,
-
     val title: String,
     val description: String,
     val link: String,
@@ -62,4 +55,8 @@ data class RealNews(
     @field:OneToOne(mappedBy = "realNews", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
     @JsonIgnore
     var fakeNews: FakeNews? = null
+
+    @field:OneToOne(mappedBy = "realNews", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
+    @JsonIgnore
+    var todayNews: TodayNews? = null
 }

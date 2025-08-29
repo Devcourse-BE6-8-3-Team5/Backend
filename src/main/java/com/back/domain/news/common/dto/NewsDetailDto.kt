@@ -6,7 +6,6 @@ data class NewsDetailDto(
     val imgUrl: String,  // 이미지 URL
     val journalist: String,  // 기자명
     val mediaName: String // 언론사명
-
 ) {
     constructor(dto: NewsDetailDto): this(
         content = dto.content,
@@ -15,3 +14,4 @@ data class NewsDetailDto(
         mediaName = dto.mediaName
     )
 }
+
