@@ -2,6 +2,7 @@ package com.back.dev.controller;
 
 import com.back.dev.service.DevTestNewsService;
 import com.back.domain.news.common.dto.NaverNewsDto;
+import com.back.domain.news.common.service.KeywordGenerationService;
 import com.back.domain.news.real.dto.RealNewsDto;
 import com.back.domain.news.real.repository.RealNewsRepository;
 import com.back.domain.news.real.service.NewsDataService;
@@ -23,6 +24,7 @@ public class DevTestController {
     private final NewsDataService newsDataService;
     private final RealNewsService realNewsService;
     private final RealNewsRepository realNewsRepository;
+    private final KeywordGenerationService keywordGenerationService;
 
 
 
@@ -45,6 +47,14 @@ public class DevTestController {
         List<NaverNewsDto> testNews = devTestNewsService.fetchNews(query);
 
         return RsData.of(200, "테스트 뉴스 메타데이터 생성 완료", testNews);
+    }
+
+    @GetMapping("/keyword")
+    public RsData<List<String>> testFetch(){
+
+        List<String> keywords = keywordGenerationService.generateTodaysKeywords().getKeywords();
+
+        return RsData.of(200, "테스트 뉴스 메타데이터 생성 완료", keywords);
     }
 
     @GetMapping("/today")

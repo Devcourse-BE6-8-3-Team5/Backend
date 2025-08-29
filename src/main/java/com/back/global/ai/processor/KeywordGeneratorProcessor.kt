@@ -4,8 +4,8 @@ import com.back.domain.news.common.dto.KeywordGenerationReqDto
 import com.back.domain.news.common.dto.KeywordGenerationResDto
 import com.back.domain.news.common.dto.KeywordWithType
 import com.back.domain.news.common.enums.KeywordType
-import com.back.global.exception.ServiceException
 import com.fasterxml.jackson.databind.ObjectMapper
+import org.slf4j.LoggerFactory
 import org.springframework.ai.chat.model.ChatResponse
 
 /**
@@ -15,7 +15,11 @@ class KeywordGeneratorProcessor(
     private val keywordGenerationReqDto: KeywordGenerationReqDto,
     private val objectMapper: ObjectMapper
 ) : AiRequestProcessor<KeywordGenerationResDto> {
-    // 뉴스 제목과 본문을 바탕으로 퀴즈 생성용 프롬프트 생성 (응답 형식을 JSON 형식으로 작성)
+
+    companion object {
+        private val log = LoggerFactory.getLogger(NewsAnalysisProcessor::class.java)
+    }
+
     override fun buildPrompt(): String {
         return """
             Task: 오늘 뉴스 수집을 위한 카테고리별 키워드를 생성하세요.
@@ -152,63 +156,52 @@ class KeywordGeneratorProcessor(
     // AI 응답을 파싱하여 KeywordGenerationResDto 리스트로 변환
     override fun parseResponse(response: ChatResponse): KeywordGenerationResDto {
         val text = response.result?.output?.text?.takeIf { it.isNotBlank() }
-            ?: throw ServiceException(500, "AI 응답이 비어있습니다")
+            ?: return createDefaultKeywords()
 
-        val result: KeywordGenerationResDto
-        val cleanedJson = text.replace("(?s)```json\\s*(.*?)\\s*```".toRegex(), "$1").trim { it <= ' ' }
+        println(">>> Raw text: $text")
+        val cleanedJson = cleanResponse(text)
+        println(">>> Parsed result: $cleanedJson")
 
-        try {
-            result = objectMapper.readValue(
-                cleanedJson,
-                KeywordGenerationResDto::class.java
-            )
+        return try {
+            val parsed = objectMapper.readValue(cleanedJson, KeywordGenerationResDto::class.java)
+            println(">>> Successfully parsed: $parsed")
+            parsed
         } catch (e: Exception) {
-            return createDefaultCase()
+            println(">>> JSON parsing failed: ${e.message}")
+            e.printStackTrace()
+            createDefaultKeywords()
         }
-
-        validateKeywords(result)
-
-        return result
     }
 
-    private fun createDefaultCase(): KeywordGenerationResDto {
-        val societyKeywords = listOf(
-            KeywordWithType("사회", KeywordType.GENERAL),
-            KeywordWithType("교육", KeywordType.GENERAL)
-        )
+    // AI 응답 정리 - 마크다운 코드 블록 제거
+    private fun cleanResponse(text: String): String {
+        return text.trim()
+            .replace(Regex("(?s)```json\\s*(.*?)\\s*```"), "$1")
+            .replace(Regex("```"), "")
+            .trim()
+    }
 
-        val economyKeywords = listOf(
-            KeywordWithType("경제", KeywordType.GENERAL),
-            KeywordWithType("시장", KeywordType.GENERAL)
-        )
 
-        val politicsKeywords = listOf(
-            KeywordWithType("정치", KeywordType.GENERAL),
-            KeywordWithType("정부", KeywordType.GENERAL)
-        )
-
-        val cultureKeywords = listOf(
-            KeywordWithType("문화", KeywordType.GENERAL),
-            KeywordWithType("예술", KeywordType.GENERAL)
-        )
-
-        val itKeywords = listOf(
-            KeywordWithType("기술", KeywordType.GENERAL),
-            KeywordWithType("IT", KeywordType.GENERAL)
-        )
+    private fun createDefaultKeywords(): KeywordGenerationResDto {
+        fun createKeywords(vararg keywords: String) = keywords.map {
+            KeywordWithType(it, KeywordType.GENERAL)
+        }
+        log.debug("키워드 생성 실패 : defaultkeywords 반환")
 
         return KeywordGenerationResDto(
-            societyKeywords,
-            economyKeywords,
-            politicsKeywords,
-            cultureKeywords,
-            itKeywords
+            society = createKeywords("사회", "교육"),
+            economy = createKeywords("경제", "시장"),
+            politics = createKeywords("정치", "정부"),
+            culture = createKeywords("문화", "예술"),
+            it = createKeywords("기술", "IT")
         )
     }
 
-    private fun validateKeywords(result: KeywordGenerationResDto) {
-        if (result.society.size != 2 || result.economy.size != 2 || result.politics.size != 2 || result.culture.size != 2 || result.it.size != 2) {
-            throw ServiceException(500, "각 카테고리당 정확히 2개의 키워드가 필요합니다.")
-        }
+    private fun validateKeywords(result: KeywordGenerationResDto): Boolean {
+        return result.society.size == 2 &&
+                result.economy.size == 2 &&
+                result.politics.size == 2 &&
+                result.culture.size == 2 &&
+                result.it.size == 2
     }
 }
