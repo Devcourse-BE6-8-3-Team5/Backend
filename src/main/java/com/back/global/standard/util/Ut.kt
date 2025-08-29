@@ -60,7 +60,7 @@ class Ut {
     }
 
     object json {
-        lateinit var objectMapper: ObjectMapper
+        val objectMapper: ObjectMapper = ObjectMapper()
 
         @JvmStatic
         @JvmOverloads

@@ -8,15 +8,17 @@ import jakarta.servlet.http.HttpServletResponse
 import org.springframework.http.ResponseCookie
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Component
+import org.springframework.web.context.annotation.RequestScope
 
 @Component
+@RequestScope
 class Rq(
     private val req: HttpServletRequest,
     private val resp: HttpServletResponse,
     private val memberService: MemberService,
 ) {
 
-    val actor: Member
+    val actor: Member?
         get() = SecurityContextHolder
             .getContext()
             ?.authentication
@@ -34,15 +36,14 @@ class Rq(
                     null
                 }
             }
-            ?: throw IllegalStateException("인증된 사용자가 없습니다.")
-
 
     fun getHeader(name: String, defaultValue: String): String {
-        return req.getHeader(name) ?: defaultValue
+        return req.getHeader(name)?.takeIf { it.isNotBlank() } ?: defaultValue
     }
 
-    fun setHeader(name: String, value: String) {
-        resp.setHeader(name, value)
+    fun setHeader(name: String, value: String?) {
+        value?.takeIf { it.isNotBlank() }
+            ?.let { resp.setHeader(name, it) }
     }
 
     fun getCookieValue(name: String, defaultValue: String): String =
@@ -71,7 +72,9 @@ class Rq(
         resp.sendRedirect(url)
     }
 
-    val actorFromDb: Member
-        get() = memberService.findById(actor.id).get()
-
+    val actorFromDb: Member?
+        get() {
+            val currentActor = actor ?: return null
+            return memberService.findById(currentActor.id).orElse(null)
+        }
 }
