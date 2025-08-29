@@ -33,7 +33,6 @@ dependencies {
     runtimeOnly("org.postgresql:postgresql:42.7.3")
     implementation("io.github.openfeign.querydsl:querydsl-jpa:7.0")
     kapt("io.github.openfeign.querydsl:querydsl-apt:7.0:jpa")
-    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.19.2")
 
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
