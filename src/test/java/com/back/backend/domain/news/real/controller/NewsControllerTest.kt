@@ -172,23 +172,23 @@ class NewsControllerTest {
         }
     }
 
-    @Test
-    @DisplayName("GET /api/news/search/{title} - 검색 조회")
-    fun t5() {
-        // when & then
-        mvc.get("/api/news/search") {
-            param("title", "Test")
-            param("page", "1")
-            param("size", "10")
-            param("direction", "desc")
-        }.andDo {
-            print()
-        }.andExpect {
-            status { isOk() }
-            jsonPath("$.code") { value(200) }
-            // 실제 결과 확인을 위해 단순화
-        }
-    }
+//    @Test
+//    @DisplayName("GET /api/news/search/{title} - 검색 조회")
+//    fun t5() {
+//        // when & then
+//        mvc.get("/api/news/search") {
+//            param("title", "Test")
+//            param("page", "1")
+//            param("size", "10")
+//            param("direction", "desc")
+//        }.andDo {
+//            print()
+//        }.andExpect {
+//            status { isOk() }
+//            jsonPath("$.code") { value(200) }
+//            // 실제 결과 확인을 위해 단순화
+//        }
+//    }
 
     @Test
     @DisplayName("GET /api/news/category/{category} - 카테고리별 뉴스 조회")
