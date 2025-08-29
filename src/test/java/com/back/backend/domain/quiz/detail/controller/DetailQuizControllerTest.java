@@ -9,6 +9,7 @@ import com.back.domain.quiz.detail.entity.Option;
 import com.back.global.rq.Rq;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -166,6 +167,7 @@ class DetailQuizControllerTest {
 
     @Test
     @DisplayName("POST /api/quiz/detail/news/{newsId}/regenerate - 뉴스 ID로 상세 퀴즈 생성")
+    @Disabled("실제 AI 호출 테스트 - 필요할 때만 실행")
     void t7() throws Exception {
         // Given
         Long newsId = 1L;
