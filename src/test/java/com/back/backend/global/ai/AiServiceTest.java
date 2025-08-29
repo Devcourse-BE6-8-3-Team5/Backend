@@ -6,6 +6,7 @@ import com.back.domain.quiz.detail.entity.Option;
 import com.back.global.ai.AiService;
 import com.back.global.ai.processor.DetailQuizProcessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.module.kotlin.KotlinModule;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.ai.chat.client.ChatClient;
@@ -25,7 +26,7 @@ public class AiServiceTest {
 
         // given
         ChatClient mockChatClient = mock(ChatClient.class, RETURNS_DEEP_STUBS);
-        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectMapper objectMapper = new ObjectMapper().registerModule(new KotlinModule.Builder().build());
 
         // Mock ChatResponse
         ChatResponse mockResponse = mock(ChatResponse.class, RETURNS_DEEP_STUBS);
@@ -73,15 +74,15 @@ public class AiServiceTest {
 
         // 첫 번째 퀴즈 검증
         DetailQuizDto firstQuiz = result.get(0);
-        assertThat(firstQuiz.question()).isEqualTo("알리바바가 발표한 모델 이름은?");
-        assertThat(firstQuiz.option1()).isEqualTo("Qwen3-Coder");
-        assertThat(firstQuiz.option2()).isEqualTo("GPT-4");
-        assertThat(firstQuiz.option3()).isEqualTo("Claude 4");
-        assertThat(firstQuiz.correctOption()).isEqualTo(Option.OPTION1);
+        assertThat(firstQuiz.getQuestion()).isEqualTo("알리바바가 발표한 모델 이름은?");
+        assertThat(firstQuiz.getOption1()).isEqualTo("Qwen3-Coder");
+        assertThat(firstQuiz.getOption2()).isEqualTo("GPT-4");
+        assertThat(firstQuiz.getOption3()).isEqualTo("Claude 4");
+        assertThat(firstQuiz.getCorrectOption()).isEqualTo(Option.OPTION1);
 
         // 두 번째, 세 번째 퀴즈 정답값 확인 (다양성 검증)
-        assertThat(result.get(1).correctOption()).isEqualTo(Option.OPTION3);
-        assertThat(result.get(2).correctOption()).isEqualTo(Option.OPTION1);
+        assertThat(result.get(1).getCorrectOption()).isEqualTo(Option.OPTION3);
+        assertThat(result.get(2).getCorrectOption()).isEqualTo(Option.OPTION1);
     }
 }
 
