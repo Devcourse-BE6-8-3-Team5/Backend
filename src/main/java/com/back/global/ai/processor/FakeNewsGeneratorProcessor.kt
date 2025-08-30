@@ -3,14 +3,9 @@ package com.back.global.ai.processor
 import com.back.domain.news.fake.dto.FakeNewsDto
 import com.back.domain.news.real.dto.RealNewsDto
 import com.fasterxml.jackson.databind.ObjectMapper
-import lombok.extern.slf4j.Slf4j
 import org.slf4j.LoggerFactory
 import org.springframework.ai.chat.model.ChatResponse
 
-/**
- * 진짜 뉴스를 기반으로 가짜 뉴스를 생성하는 AI 요청 Processor 입니다.
- */
-@Slf4j
 class FakeNewsGeneratorProcessor(
     private val realNewsDto: RealNewsDto,
     private val objectMapper: ObjectMapper
@@ -81,8 +76,7 @@ class FakeNewsGeneratorProcessor(
             6. 원본 내용 그대로 복사하기
             7. 비현실적이거나 과장된 내용
             8. ${contentLength}자를 크게 벗어나는 분량
-            9. **\
-             같은 이스케이프 문자 그대로 출력하기**
+            9. **\n 같은 이스케이프 문자 그대로 출력하기**
             10. **content 내부에 실제 개행문자(Enter) 사용 - JSON 파싱 실패!**
             11. **JSON 구조 중간에 끊어지기 - 파싱 불가능!**
             12. **Control character (줄바꿈, 탭 등) 원본 그대로 사용**
@@ -90,9 +84,7 @@ class FakeNewsGeneratorProcessor(
             === 💡 중요한 작성 원칙 💡 ===
             - content는 **바로 본문부터 시작**합니다
             - content는 **한 줄로 연속된 문자열**이어야 함
-            - 문단 구분이 필요하면 **반드시 \
-            \
-             텍스트로 표현**
+            - 문단 구분이 필요하면 **반드시 \n\n 텍스트로 표현**
             - 제목이나 헤더는 절대 포함하지 마세요
             - 첫 문장부터 바로 뉴스 내용으로 시작하세요
             - JSON 외부에 다른 텍스트 추가 금지
@@ -106,10 +98,8 @@ class FakeNewsGeneratorProcessor(
             }
             
             **이스케이프 처리:**
-            - 내부 따옴표: \${'"'} (백슬래시 + 따옴표)
-            - **문단 구분: \
-            \
-             (백슬래시n 두 번)**
+            - 내부 따옴표: \" (백슬래시 + 따옴표)
+            - **문단 구분: \n\n (백슬래시n 두 번)**
             - 백슬래시: \\ (백슬래시 + 백슬래시)
             - 작은따옴표: 그대로 ' 사용 (이스케이프 금지)
             - 한글, 영문, 숫자: 그대로 사용 (유니코드 변환 금지)
@@ -144,7 +134,6 @@ class FakeNewsGeneratorProcessor(
         log.debug(">>> 정리 후 JSON\n{}", cleanedJson)
 
         return runCatching {
-            // JsonNode를 사용한 안전한 파싱
             val jsonNode = objectMapper.readTree(cleanedJson)
             val contentNode = jsonNode.get("content")
 
