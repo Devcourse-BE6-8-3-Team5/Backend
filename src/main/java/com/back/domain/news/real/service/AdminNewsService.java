@@ -6,6 +6,7 @@ import com.back.domain.news.common.service.KeepAliveMonitoringService;
 import com.back.domain.news.common.service.KeywordGenerationService;
 import com.back.domain.news.real.dto.RealNewsDto;
 import com.back.domain.news.real.event.RealNewsCreatedEvent;
+import com.back.domain.news.today.service.TodayNewsService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
@@ -29,6 +30,7 @@ public class AdminNewsService {
     private final static List<String> STATIC_KEYWORD = Arrays.asList("속보", "긴급", "단독");
     private final ApplicationEventPublisher publisher;
     private final KeepAliveMonitoringService keepAliveMonitoringService;
+    private final TodayNewsService todayNewsService;
 
 
     @Scheduled(cron = "0 0 0 * * *", zone = "Asia/Seoul") // 매일 자정에 실행
@@ -50,7 +52,7 @@ public class AdminNewsService {
                 log.warn("저장된 뉴스가 없습니다. 오늘의 뉴스 수집이 실패했을 수 있습니다.");
                 return;
             }
-            newsDataService.setTodayNews(savedNews.getFirst().getId());
+            todayNewsService.setTodayNews(savedNews.getFirst().getId());
 
             List<Long> realNewsIds = savedNews.stream()
                     .map(RealNewsDto::getId)

@@ -25,6 +25,7 @@ public class NewsAnalysisService {
     private int batchSize;
 
 
+
     public List<AnalyzedNewsDto> filterAndScoreNews(List<RealNewsDto> allRealNewsBeforeFilter) {
         if (allRealNewsBeforeFilter == null || allRealNewsBeforeFilter.isEmpty()) {
             log.warn("필터링할 뉴스가 없습니다.");
