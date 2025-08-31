@@ -14,16 +14,12 @@ import jakarta.validation.Valid
 import jakarta.validation.constraints.Email
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.Size
-import lombok.RequiredArgsConstructor
-import lombok.extern.slf4j.Slf4j
 import org.springframework.http.HttpStatus
 import org.springframework.transaction.annotation.Transactional
 import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/api/members")
-@RequiredArgsConstructor
-@Slf4j
 @Tag(name = "MemberController", description = "회원 관련 컨트롤러 엔드 포인트")
 class MemberController(
     private val memberService: MemberService,
