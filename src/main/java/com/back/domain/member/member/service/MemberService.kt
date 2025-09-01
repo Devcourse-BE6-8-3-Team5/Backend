@@ -95,9 +95,10 @@ class MemberService(
         return memberRepository.findById(id)
     }
 
-    fun payload(accessToken: String): MutableMap<String?, Any?>? {
+    fun payload(accessToken: String): Map<String, Any>? {
         return authTokenService.payload(accessToken)
     }
+
 
     fun findByApiKey(apiKey: String): Optional<Member> {
         return memberRepository.findByApiKey(apiKey)
