@@ -38,10 +38,9 @@ class FactQuiz(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long = 0
 
-    @JvmField
     @Enumerated(EnumType.STRING)
     val quizType: @NotNull QuizType = QuizType.FACT
 
     @CreatedDate
-    lateinit var createDate: LocalDateTime
+    lateinit var createdDate: LocalDateTime
 }

@@ -199,7 +199,7 @@ public class FactQuizService {
         quizHistoryService.save(
                 managedActor,
                 id,
-                factQuiz.quizType,
+                factQuiz.getQuizType(),
                 String.valueOf(selectedNewsType),
                 isCorrect,
                 gainExp
@@ -212,7 +212,7 @@ public class FactQuizService {
                 factQuiz.getCorrectNewsType(),
                 isCorrect,
                 gainExp,
-                factQuiz.quizType
+                factQuiz.getQuizType()
         );
 
     }

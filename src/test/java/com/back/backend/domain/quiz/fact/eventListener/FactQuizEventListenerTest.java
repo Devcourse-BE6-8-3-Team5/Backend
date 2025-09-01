@@ -101,7 +101,7 @@ public class FactQuizEventListenerTest {
         newQuizzes.forEach(quiz -> {
             assertThat(quiz.getQuestion()).isNotBlank();
             assertThat(quiz.getCorrectNewsType()).isNotNull();
-            assertThat(quiz.quizType).isEqualTo(QuizType.FACT);
+            assertThat(quiz.getQuizType()).isEqualTo(QuizType.FACT);
             assertThat(quiz.getFakeNews()).isNotNull();
             assertThat(quiz.getRealNews()).isNotNull();
             assertThat(quiz.getFakeNews().getId()).isEqualTo(quiz.getRealNews().getId());
