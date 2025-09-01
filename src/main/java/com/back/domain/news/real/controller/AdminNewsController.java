@@ -7,6 +7,7 @@ import com.back.domain.news.real.dto.RealNewsDto;
 import com.back.domain.news.real.service.AdminNewsService;
 import com.back.domain.news.real.service.NewsDataService;
 import com.back.domain.news.real.service.RealNewsService;
+import com.back.domain.news.today.service.TodayNewsService;
 import com.back.global.rsData.RsData;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -37,6 +38,7 @@ public class AdminNewsController {
     private final NewsDataService newsDataService;
     private final RealNewsService realNewsService;
     private final NewsPageService newsPageService;
+    private final TodayNewsService todayNewsService;
 
     // 오늘의 뉴스 설정용 뉴스 조회
     @GetMapping("/all")
@@ -105,16 +107,16 @@ public class AdminNewsController {
 
         try {
             // 1. 뉴스 존재 여부 확인
-            Optional<RealNewsDto> realNewsDto = realNewsService.getRealNewsDtoById(newsId);
+            Optional<RealNewsDto> realNewsDto = Optional.ofNullable(realNewsService.getRealNewsDtoById(newsId));
             if (realNewsDto.isEmpty()) {
                 return RsData.of(404, String.format("ID %d에 해당하는 뉴스가 존재하지 않습니다", newsId));
             }
             // 2. 이미 오늘의 뉴스인지 확인
-            if (newsDataService.isAlreadyTodayNews(newsId)) {
+            if (todayNewsService.isAlreadyTodayNews(newsId)) {
                 return RsData.of(400, "이미 오늘의 뉴스로 설정되어 있습니다.", realNewsDto.get());
             }
 
-            newsDataService.setTodayNews(newsId);
+            todayNewsService.setTodayNews(newsId);
 
             return RsData.of(200, "오늘의 뉴스가 설정되었습니다.", realNewsDto.get());
 
@@ -146,7 +148,7 @@ public class AdminNewsController {
             return RsData.of(403, "오늘의 뉴스는 탭을 통해 조회해주세요.");
         }
 
-        Optional<RealNewsDto> realNewsDto = realNewsService.getRealNewsDtoById(newsId);
+        Optional<RealNewsDto> realNewsDto = Optional.ofNullable(realNewsService.getRealNewsDtoById(newsId));
 
         return newsPageService.getSingleNews(realNewsDto, NewsType.REAL, newsId);
     }
@@ -165,7 +167,7 @@ public class AdminNewsController {
             return RsData.of(404, "조회할 뉴스가 없습니다.");
         }
 
-        Optional<RealNewsDto> todayNews = realNewsService.getRealNewsDtoById(todayNewsId);
+        Optional<RealNewsDto> todayNews = Optional.ofNullable(realNewsService.getRealNewsDtoById(todayNewsId));
 
         return newsPageService.getSingleNews(todayNews, NewsType.REAL, todayNews.get().getId());
     }
@@ -280,4 +282,6 @@ public class AdminNewsController {
                 && page > 0
                 && size >= 1 && size <= 100;
     }
+
+
 }

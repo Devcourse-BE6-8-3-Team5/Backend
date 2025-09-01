@@ -6,6 +6,7 @@ import com.back.domain.news.fake.dto.FakeNewsDto
 import com.back.domain.news.fake.service.FakeNewsService
 import com.back.domain.news.real.dto.RealNewsDto
 import com.back.domain.news.real.service.NewsDataService
+import com.back.domain.news.today.service.TodayNewsService
 import com.back.domain.quiz.daily.service.DailyQuizService
 import com.back.domain.quiz.detail.dto.DetailQuizDto
 import com.back.domain.quiz.detail.entity.Option
@@ -31,6 +32,9 @@ class DevInitData(
     private val factQuizService: FactQuizService,
     private val dailyQuizService: DailyQuizService
 ) {
+    @Autowired
+    private lateinit var todayNewsService: TodayNewsService
+
     @Autowired
     @Lazy
     private val self: DevInitData? = null
@@ -408,7 +412,7 @@ class DevInitData(
         val savedNewsList = newsDataService.saveAllRealNews(newsList)
 
         if (!savedNewsList.isEmpty()) {
-            newsDataService.setTodayNews(savedNewsList[0].id)
+            todayNewsService.setTodayNews(savedNewsList[0].id)
         }
     }
 

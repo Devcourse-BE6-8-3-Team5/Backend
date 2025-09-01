@@ -59,14 +59,14 @@ public class DevTestController {
 
     @GetMapping("/today")
     public RsData<RealNewsDto> getTodayNews() {
-        Long todayNewsId = realNewsService.getTodayNewsOrRecent();
+        long todayNewsId = realNewsService.getTodayNewsOrRecent();
         System.out.println("=== DEBUG: todayNewsId = " + todayNewsId);
 
         // DB에서 직접 확인
         boolean exists = realNewsRepository.existsById(todayNewsId);
         System.out.println("=== DEBUG: exists in DB = " + exists);
 
-        Optional<RealNewsDto> todayNews = realNewsService.getRealNewsDtoById(todayNewsId);
+        Optional<RealNewsDto> todayNews = Optional.ofNullable(realNewsService.getRealNewsDtoById(todayNewsId));
         System.out.println("=== DEBUG: found DTO = " + todayNews.isPresent());
 
         return todayNews

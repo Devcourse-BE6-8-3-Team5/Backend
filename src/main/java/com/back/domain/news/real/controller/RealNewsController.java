@@ -54,7 +54,7 @@ public class RealNewsController {
             return RsData.of(403, "오늘의 뉴스는 탭을 통해 조회해주세요.");
         }
 
-        Optional<RealNewsDto> realNewsDto = realNewsService.getRealNewsDtoById(newsId);
+        Optional<RealNewsDto> realNewsDto = Optional.ofNullable(realNewsService.getRealNewsDtoById(newsId));
 
         return newsPageService.getSingleNews(realNewsDto, NewsType.REAL, newsId);
     }
@@ -68,7 +68,7 @@ public class RealNewsController {
     @GetMapping("/today")
     public RsData<RealNewsDto> getTodayNews() {
         Long todayNewsId = realNewsService.getTodayNewsOrRecent();
-        Optional<RealNewsDto> todayNews = realNewsService.getRealNewsDtoById(todayNewsId);
+        Optional<RealNewsDto> todayNews = Optional.ofNullable(realNewsService.getRealNewsDtoById(todayNewsId));
 
         if (todayNews.isEmpty()) {
             return RsData.of(404, "조회할 뉴스가 없습니다.");

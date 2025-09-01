@@ -158,17 +158,14 @@ class KeywordGeneratorProcessor(
         val text = response.result?.output?.text?.takeIf { it.isNotBlank() }
             ?: return createDefaultKeywords()
 
-        println(">>> Raw text: $text")
         val cleanedJson = cleanResponse(text)
-        println(">>> Parsed result: $cleanedJson")
 
-        return try {
-            val parsed = objectMapper.readValue(cleanedJson, KeywordGenerationResDto::class.java)
-            println(">>> Successfully parsed: $parsed")
-            parsed
-        } catch (e: Exception) {
+        return runCatching {
+            objectMapper.readValue(cleanedJson, KeywordGenerationResDto::class.java)
+        }.onFailure { e ->
             println(">>> JSON parsing failed: ${e.message}")
             e.printStackTrace()
+        }.getOrElse {
             createDefaultKeywords()
         }
     }
@@ -195,13 +192,5 @@ class KeywordGeneratorProcessor(
             culture = createKeywords("문화", "예술"),
             it = createKeywords("기술", "IT")
         )
-    }
-
-    private fun validateKeywords(result: KeywordGenerationResDto): Boolean {
-        return result.society.size == 2 &&
-                result.economy.size == 2 &&
-                result.politics.size == 2 &&
-                result.culture.size == 2 &&
-                result.it.size == 2
     }
 }

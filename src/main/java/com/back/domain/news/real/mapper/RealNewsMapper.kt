@@ -6,8 +6,8 @@ import org.springframework.stereotype.Component
 
 @Component
 class RealNewsMapper {
-    fun toEntityList(realNewsDtoList: MutableList<RealNewsDto>): MutableList<RealNews> {
-        return realNewsDtoList.map { toEntity(it) }.toMutableList()
+    fun toEntityList(realNewsDtoList: List<RealNewsDto>): List<RealNews> {
+        return realNewsDtoList.map { toEntity(it) }.toList()
     }
 
     fun toEntity(realNewsDto: RealNewsDto): RealNews {
@@ -26,8 +26,8 @@ class RealNewsMapper {
         )
     }
 
-    fun toDtoList(realNewsList: MutableList<RealNews>): MutableList<RealNewsDto> {
-        return realNewsList.map { toDto(it)}.toMutableList()
+    fun toDtoList(realNewsList: List<RealNews>): List<RealNewsDto> {
+        return realNewsList.map { toDto(it)}.toList()
     }
 
     fun toDto(realNews: RealNews): RealNewsDto {

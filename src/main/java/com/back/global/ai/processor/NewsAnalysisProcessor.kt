@@ -4,8 +4,6 @@ import com.back.domain.news.common.dto.AnalyzedNewsDto
 import com.back.domain.news.common.enums.NewsCategory
 import com.back.domain.news.real.dto.RealNewsDto
 import com.back.global.exception.ServiceException
-import com.fasterxml.jackson.annotation.JsonProperty
-import com.fasterxml.jackson.core.JsonProcessingException
 import com.fasterxml.jackson.databind.ObjectMapper
 import org.slf4j.LoggerFactory
 import org.springframework.ai.chat.model.ChatResponse
@@ -145,94 +143,69 @@ class NewsAnalysisProcessor(
 
     }
 
-
     override fun parseResponse(response: ChatResponse): MutableList<AnalyzedNewsDto> {
         val text = response.result?.output?.text?.takeIf { it.isNotBlank() }
-        ?: throw ServiceException(500, "AI 응답이 비어있습니다")
+            ?: return mutableListOf()
 
-        log.debug("AI 응답 길이: {}", text.length)
+        val cleanedJson = cleanResponse(text)
+        log.debug("정제된 JSON(앞 500자): {}", cleanedJson.take(500))
 
-        return try {
-            val cleanedJson = cleanResponse(text)
-            log.debug("정제된 JSON(앞 500자): {}", cleanedJson.take(500))
+        return runCatching {
+            val rootNode = objectMapper.readTree(cleanedJson)
 
-            val results: MutableList<NewsAnalyzedRes> = objectMapper.readValue(
-                cleanedJson,
-                objectMapper.typeFactory.constructCollectionType(MutableList::class.java, NewsAnalyzedRes::class.java)
-            )
+            if (!rootNode.isArray) {
+                return@runCatching null
+            }
 
-            convertToFilteredNewsDto(results)
-        } catch (e: JsonProcessingException) {
+            val results = rootNode.mapNotNull { itemNode ->
+                runCatching {
+                    val newsIndex = itemNode.get("newsIndex")?.asInt()?.takeIf { it in 1..newsToAnalyze.size }
+                    val qualityScore = itemNode.get("qualityScore")?.asInt()
+                    val categoryString = itemNode.get("category")?.asText()?.takeIf { it.isNotBlank() }
+                    val cleanedContent = itemNode.get("cleanedContent")?.asText()?.takeIf { it.isNotBlank() }
+                    val category = categoryString?.let {
+                        runCatching { NewsCategory.valueOf(it.uppercase()) }.getOrNull()
+                    }
+
+                    if (newsIndex != null && qualityScore != null && category != null && cleanedContent != null) {
+                        createAnalyzedNewsDto(newsIndex - 1, qualityScore, category, cleanedContent)
+                    } else null
+
+                }.getOrNull()
+            }
+
+            if (results.isEmpty()) {
+                return@runCatching null
+            }
+
+            results.toMutableList()
+
+        }.onFailure { e ->
             log.error("JSON 파싱 실패: {}", e.message)
-            log.error("JSON 파싱 실패. 원본(앞 500자): {}", text.take(500))
-            log.error("JSON 파싱 실패. 정제본(앞 500자): {}", runCatching { cleanResponse(text).take(500) }.getOrElse { "정제 실패" })
-            throw ServiceException(500, "AI 응답의 JSON 형식이 올바르지 않습니다: ${e.message}")
-        } catch (e: IllegalArgumentException) {
-            log.error("데이터 변환 실패: {}", e.message)
-            throw ServiceException(500, "AI 응답 데이터 변환에 실패했습니다: ${e.message}")
-        } catch (e: Exception) {
-            log.error("예상치 못한 오류: {}", e.message)
-            throw ServiceException(500, "AI 응답 처리 중 예상치 못한 오류가 발생했습니다: ${e.message}")
-        }
+            log.error("파싱 시도한 JSON: {}", cleanedJson.take(500))
+        }.getOrNull() ?: mutableListOf()
     }
 
-    // AI 응답 정리 - 마크다운 코드 블록 제거
-    private fun cleanResponse(text: String): String {
-        return text.trim()
+    private fun createAnalyzedNewsDto(index: Int, qualityScore: Int, newsCategory: NewsCategory, cleanedContent: String): AnalyzedNewsDto {
+        val originalNews = newsToAnalyze[index]
+
+        val updatedNews = originalNews.copy(
+            content = cleanedContent,
+            newsCategory = newsCategory
+        )
+
+        return AnalyzedNewsDto(updatedNews, qualityScore, newsCategory)
+    }
+
+    private fun cleanResponse(text: String): String =
+        text.trim()
             .replace(Regex("(?s)```json\\s*(.*?)\\s*```"), "$1")
             .replace(Regex("```"), "")
             .trim()
-    }
 
-    // 프롬프트용 텍스트 정리
-    private fun cleanText(text: String): String {
-        return text.replace("\"", "'")
+    private fun cleanText(text: String): String =
+        text.replace("\"", "'")
             .replace(Regex("\\s+"), " ")
             .trim()
-    }
 
-    //  결과를 FilteredNewsDto로 변환
-    private fun convertToFilteredNewsDto(results: MutableList<NewsAnalyzedRes>): MutableList<AnalyzedNewsDto> {
-        require (results.size == newsToAnalyze.size) {
-            throw ServiceException(500,String.format("결과 개수 불일치: 요청 ${newsToAnalyze.size}개, 응답 ${results.size}개")
-            )
-        }
-
-        return results.map { result ->
-            val index = result.newsIndex - 1 // 1-based to 0-based
-            val originalNews = newsToAnalyze[index]
-
-            // 카테고리가 적용된 새로운 RealNewsDto 생성
-            val updatedNews = RealNewsDto(
-                originalNews.id,
-                originalNews.title,
-                result.cleanedContent,
-                originalNews.description,
-                originalNews.link,
-                originalNews.imgUrl,
-                originalNews.originCreatedDate,
-                originalNews.createdDate,
-                originalNews.mediaName,
-                originalNews.journalist,
-                originalNews.originalNewsUrl,
-                result.category
-            )
-            AnalyzedNewsDto(updatedNews, result.qualityScore, result.category)
-        }.toMutableList()
-    }
-
-
-    private data class NewsAnalyzedRes(
-        @JsonProperty("newsIndex")
-        val newsIndex: Int,
-
-        @JsonProperty("qualityScore")
-        val qualityScore: Int,
-
-        @JsonProperty("category")
-        val category: NewsCategory,
-
-        @JsonProperty("cleanedContent")
-        val cleanedContent: String
-    )
 }

@@ -2,6 +2,8 @@ package com.back.dev.service;
 
 import com.back.domain.news.common.dto.AnalyzedNewsDto;
 import com.back.domain.news.common.dto.NaverNewsDto;
+import com.back.domain.news.fake.dto.FakeNewsDto;
+import com.back.domain.news.fake.service.FakeNewsService;
 import com.back.domain.news.real.dto.RealNewsDto;
 import com.back.domain.news.real.service.NewsAnalysisService;
 import com.back.domain.news.real.service.NewsDataService;
@@ -28,7 +30,7 @@ public class DevTestNewsService {
     private final NewsDataService newsDataService;
     private final RestTemplate restTemplate;
     private final NewsAnalysisService newsAnalysisService;
-
+    private final FakeNewsService fakeNewsService;
     @Value("${NAVER_CLIENT_ID}")
     private String clientId;
 
@@ -58,6 +60,8 @@ public class DevTestNewsService {
         List<RealNewsDto> selectedNews = newsDataService.selectNewsByScore(newsAfterFilter);
 
         List<RealNewsDto> savedNews = newsDataService.saveAllRealNews(selectedNews);
+
+        List<FakeNewsDto> fakeNews = fakeNewsService.generateAndSaveAllFakeNews(savedNews);
 
         return savedNews;
     }
