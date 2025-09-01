@@ -30,7 +30,7 @@ class CustomOAuth2LoginSuccessHandler(
 
         // Rq의 헬퍼 메서드를 사용하여 쿠키 설정
         rq.setCrossDomainCookie("accessToken", accessToken, TimeUnit.MINUTES.toSeconds(20).toInt())
-        rq.setCrossDomainCookie("refreshToken", refreshToken, TimeUnit.DAYS.toSeconds(7).toInt())
+        rq.setCrossDomainCookie("apiKey", refreshToken, TimeUnit.DAYS.toSeconds(7).toInt())
 
         // state 값에서 프론트엔드 리다이렉트 주소 복원
         var redirectUrl = "https://news-ox.vercel.app/"
