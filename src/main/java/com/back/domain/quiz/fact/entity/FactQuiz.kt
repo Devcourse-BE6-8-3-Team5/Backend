@@ -39,7 +39,8 @@ class FactQuiz(
     val id: Long = 0
 
     @Enumerated(EnumType.STRING)
-    val quizType: @NotNull QuizType = QuizType.FACT
+    @NotNull
+    val quizType: QuizType = QuizType.FACT
 
     @CreatedDate
     lateinit var createdDate: LocalDateTime
