@@ -1,8 +1,8 @@
 package com.back.backend.domain.quiz.daily.eventListener;
 
-import com.back.domain.news.real.service.NewsDataService;
 import com.back.domain.news.today.event.TodayNewsCreatedEvent;
 import com.back.domain.news.today.repository.TodayNewsRepository;
+import com.back.domain.news.today.service.TodayNewsService;
 import com.back.domain.quiz.daily.entity.DailyQuiz;
 import com.back.domain.quiz.daily.repository.DailyQuizRepository;
 import com.back.domain.quiz.detail.event.DetailQuizCreatedEvent;
@@ -36,7 +36,7 @@ import static org.awaitility.Awaitility.await;
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 public class DailyQuizEventListenerTest {
     @Autowired
-    private NewsDataService newsDataService;
+    private TodayNewsService todayNewsService;
     @Autowired
     private DailyQuizRepository dailyQuizRepository;
     @Autowired
@@ -90,7 +90,7 @@ public class DailyQuizEventListenerTest {
         Long todayNewsId = 5L;
 
         // When
-        newsDataService.setTodayNews(todayNewsId); // 내부에서 TodayNewsCreatedEvent 발행
+        todayNewsService.setTodayNews(todayNewsId); // 내부에서 TodayNewsCreatedEvent 발행
 
         // Then - 비동기 처리 완료 대기
         await().atMost(5, SECONDS).untilAsserted(() -> {
