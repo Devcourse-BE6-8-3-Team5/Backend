@@ -107,7 +107,7 @@ public class AdminNewsController {
 
         try {
             // 1. 뉴스 존재 여부 확인
-            Optional<RealNewsDto> realNewsDto = realNewsService.getRealNewsDtoById(newsId);
+            Optional<RealNewsDto> realNewsDto = Optional.ofNullable(realNewsService.getRealNewsDtoById(newsId));
             if (realNewsDto.isEmpty()) {
                 return RsData.of(404, String.format("ID %d에 해당하는 뉴스가 존재하지 않습니다", newsId));
             }
@@ -148,7 +148,7 @@ public class AdminNewsController {
             return RsData.of(403, "오늘의 뉴스는 탭을 통해 조회해주세요.");
         }
 
-        Optional<RealNewsDto> realNewsDto = realNewsService.getRealNewsDtoById(newsId);
+        Optional<RealNewsDto> realNewsDto = Optional.ofNullable(realNewsService.getRealNewsDtoById(newsId));
 
         return newsPageService.getSingleNews(realNewsDto, NewsType.REAL, newsId);
     }
@@ -167,7 +167,7 @@ public class AdminNewsController {
             return RsData.of(404, "조회할 뉴스가 없습니다.");
         }
 
-        Optional<RealNewsDto> todayNews = realNewsService.getRealNewsDtoById(todayNewsId);
+        Optional<RealNewsDto> todayNews = Optional.ofNullable(realNewsService.getRealNewsDtoById(todayNewsId));
 
         return newsPageService.getSingleNews(todayNews, NewsType.REAL, todayNews.get().getId());
     }

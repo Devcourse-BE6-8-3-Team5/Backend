@@ -53,7 +53,7 @@ class NewsDataService(
     }
 
     @Transactional
-    fun saveAllRealNews(realNewsDtoList: MutableList<RealNewsDto>): List<RealNewsDto> {
+    fun saveAllRealNews(realNewsDtoList: List<RealNewsDto>): List<RealNewsDto> {
         // DTO → Entity 변환 후 저장
         val realNewsList: List<RealNews> = realNewsMapper.toEntityList(realNewsDtoList)
         val savedEntities = realNewsRepository.saveAll(realNewsList) // 저장된 결과 받기
@@ -134,7 +134,7 @@ class NewsDataService(
             .map { it.realNewsDto}
     }
 
-    fun addKeywords(keywords: MutableList<String>, staticKeyword: MutableList<String>): MutableList<String> {
+    fun addKeywords(keywords: List<String>, staticKeyword: List<String>): MutableList<String> {
         return Stream.concat(keywords.stream(), staticKeyword.stream())
             .distinct()
             .toList()
