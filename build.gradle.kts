@@ -72,6 +72,7 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
     implementation("org.jetbrains.kotlin:kotlin-reflect")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
+    testImplementation("org.awaitility:awaitility:4.2.0")
 }
 
 dependencyManagement {
