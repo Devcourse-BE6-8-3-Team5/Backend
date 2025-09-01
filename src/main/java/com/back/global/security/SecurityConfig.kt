@@ -37,6 +37,7 @@ class SecurityConfig(
     )
 
     private val authenticatedPaths = listOf(
+        "/api/histories",
         "/api/quiz/detail/*/**",
         "/api/quiz/daily/*/**",
         "/api/members/info",

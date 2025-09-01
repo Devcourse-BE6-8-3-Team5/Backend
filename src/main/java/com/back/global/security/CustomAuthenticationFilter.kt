@@ -40,6 +40,7 @@ class CustomAuthenticationFilter(
     )
 
     private val authRequiredPaths = setOf(
+        "/api/histories",
         "/api/members/info",
         "/api/members/logout",
         "/api/members/withdraw"
