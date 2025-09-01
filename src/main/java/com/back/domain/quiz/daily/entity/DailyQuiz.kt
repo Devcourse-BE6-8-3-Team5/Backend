@@ -9,14 +9,14 @@ import jakarta.validation.constraints.NotNull
 
 @Entity
 class DailyQuiz(
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "today_news_id")
-    @JsonIgnore
+    @field:ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @field:JoinColumn(name = "today_news_id")
+    @field:JsonIgnore
     var todayNews: TodayNews,
 
-    @OneToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "detail_quiz_id", unique = true)
-    @JsonIgnore
+    @field:OneToOne(fetch = FetchType.LAZY, optional = false)
+    @field:JoinColumn(name = "detail_quiz_id", unique = true)
+    @field:JsonIgnore
     var detailQuiz: DetailQuiz
 ) {
     @Id
