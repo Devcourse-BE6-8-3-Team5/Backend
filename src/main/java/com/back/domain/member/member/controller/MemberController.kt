@@ -28,9 +28,9 @@ class MemberController(
 
     @JvmRecord
     data class JoinReqBody(
-        @field:NotBlank @field:Size(min = 2, max = 30, message = "이름은 최소 2자 이상이어야 합니다.") val name: String?,
-        @field:NotBlank @field:Size(min = 10, max = 50) val password: String?,
-        @field:NotBlank @field:Email(message = "유효한 이메일 형식이어야 합니다.") val email: String?
+        @field:NotBlank @field:Size(min = 2, max = 30, message = "이름은 최소 2자 이상이어야 합니다.") val name: String,
+        @field:NotBlank @field:Size(min = 10, max = 50) val password: String,
+        @field:NotBlank @field:Email(message = "유효한 이메일 형식이어야 합니다.") val email: String
     )
 
     // 회원가입
@@ -58,8 +58,8 @@ class MemberController(
     // 로그인 요청 시 (이메일, 비밀번호)
     @JvmRecord
     data class LoginReqBody(
-        @field:NotBlank @field:Email(message = "유효한 이메일 형식이어야 합니다.") val email: String?,
-        @field:NotBlank val password: String?
+        @field:NotBlank @field:Email(message = "유효한 이메일 형식이어야 합니다.") val email: String,
+        @field:NotBlank val password: String
     )
 
     // 로그인 응답 시 (MemberWithAuthDto, apiKey, accessToken)
@@ -138,9 +138,9 @@ class MemberController(
 
     @JvmRecord
     data class ModifyReqBody(
-        @field:NotBlank @field:Size(min = 2, max = 30, message = "이름은 최소 2자 이상이어야 합니다.") val name: String?,
-        @field:NotBlank @field:Size(min = 10, max = 50) val password: String?,
-        @field:NotBlank @field:Email(message = "유효한 이메일 형식이어야 합니다.") val email: String?
+        @field:NotBlank @field:Size(min = 2, max = 30, message = "이름은 최소 2자 이상이어야 합니다.") val name: String,
+        @field:NotBlank @field:Size(min = 10, max = 50) val password: String,
+        @field:NotBlank @field:Email(message = "유효한 이메일 형식이어야 합니다.") val email: String
     )
 
     @Operation(summary = "회원 정보 수정 (이름,비밀번호,메일)")
@@ -199,7 +199,7 @@ class MemberController(
     @GetMapping("/rank")
     @Transactional(readOnly = true)
     fun rank(): RsData<MutableList<MemberWithRankDto>> {
-        val members = memberService.getTop5MembersByExp()
+        val members = memberService.top5MembersByExp
 
         return RsData(
             200,
