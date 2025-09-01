@@ -11,21 +11,19 @@ import java.util.Collections.synchronizedList
 import java.util.concurrent.CompletableFuture.allOf
 
 @Service
-class NewsAnalysisService(private val newsAnalysisBatchService: NewsAnalysisBatchService) {
-
+class NewsAnalysisService(
+    private val newsAnalysisBatchService: NewsAnalysisBatchService,
+    @Value("\${news.filter.batch.size:2}") private val batchSize: Int
+) {
     companion object {
         private val log = LoggerFactory.getLogger(NewsAnalysisService::class.java)
     }
-
-    @Value("\${news.filter.batch.size:2}")
-    private val batchSize = 0
 
     fun filterAndScoreNews(allRealNewsBeforeFilter: List<RealNewsDto>?): List<AnalyzedNewsDto> {
         if (allRealNewsBeforeFilter.isNullOrEmpty()) {
             log.warn("필터링할 뉴스가 없습니다.")
             return emptyList()
         }
-
         log.info("뉴스 필터링 시작 - 총 ${allRealNewsBeforeFilter.size}개")
 
         val batches = allRealNewsBeforeFilter.chunked(batchSize)
@@ -38,7 +36,6 @@ class NewsAnalysisService(private val newsAnalysisBatchService: NewsAnalysisBatc
                 .exceptionally { throwable -> log.error("배치 처리 실패", throwable)
                     if (isTaskRejectionException(throwable))
                         log.error("스레드풀 용량 부족 - 스레드 크기 확인 필요")
-
                     null
                 }
         }

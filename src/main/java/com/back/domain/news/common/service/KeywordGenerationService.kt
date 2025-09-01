@@ -18,19 +18,11 @@ class KeywordGenerationService(
     private val aiService: AiService,
     private val objectMapper: ObjectMapper,
     private val keywordHistoryService: KeywordHistoryService,
-    private val keywordCleanupService: KeywordCleanupService
+    private val keywordCleanupService: KeywordCleanupService,
+    @Value("\${keyword.overuse.days}") private val overuseDays: Int,
+    @Value("\${keyword.overuse.threshold}")private val overuseThreshold : Int,
+    @Value("\${keyword.history.recent-days}")private val recentDays: Int
 ) {
-
-
-    @Value("\${keyword.overuse.days}")
-    private val overuseDays = 0
-
-    @Value("\${keyword.overuse.threshold}")
-    private val overuseThreshold = 0
-
-    @Value("\${keyword.history.recent-days}")
-    private val recentDays = 0
-
     companion object{
         private val log = LoggerFactory.getLogger(KeywordGenerationService::class.java)
     }

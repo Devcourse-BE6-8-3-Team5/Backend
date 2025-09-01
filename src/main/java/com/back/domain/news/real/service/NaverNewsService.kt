@@ -24,34 +24,16 @@ class NaverNewsService(
     private val newsDeduplicationService: NewsDeduplicationService,
     private val restTemplate: RestTemplate,
     private val rateLimiter: RateLimiter,
-    private val objectMapper: ObjectMapper
+    private val objectMapper: ObjectMapper,
+    @Value("\${NAVER_CLIENT_ID}") private val clientId: String,
+    @Value("\${NAVER_CLIENT_SECRET}") private val clientSecret: String,
+    @Value("\${naver.news.display}") private val newsDisplayCount: Int,
+    @Value("\${naver.crawling.delay}") private val crawlingDelay: Int,
+    @Value("\${naver.base-url}") private val naverUrl: String,
+    @Value("\${naver.news.sort}") private val newsSortOrder: String,
+    @Value("\${news.dedup.description.threshold}") private var  descriptionSimilarityThreshold: Double,
+    @Value("\${news.dedup.title.threshold}") private var  titleSimilarityThreshold: Double
 ) {
-
-
-    @Value("\${NAVER_CLIENT_ID}")
-    private lateinit var clientId: String
-
-    @Value("\${NAVER_CLIENT_SECRET}")
-    private lateinit var clientSecret: String
-
-    @Value("\${naver.news.display}")
-    private var newsDisplayCount: Int = 0
-
-    @Value("\${naver.crawling.delay}")
-    private var crawlingDelay: Int = 0
-
-    @Value("\${naver.base-url}")
-    private lateinit var naverUrl: String
-
-    @Value("\${naver.news.sort}")
-    private lateinit var newsSortOrder: String
-
-    @Value("\${news.dedup.description.threshold}") // 요약본 임계값
-    private var  descriptionSimilarityThreshold = 0.0
-
-    @Value("\${news.dedup.title.threshold}") // 제목 임계값
-    private var  titleSimilarityThreshold = 0.0
-
     companion object {
         private val log = LoggerFactory.getLogger(NaverNewsService::class.java)
     }
@@ -66,7 +48,6 @@ class NaverNewsService(
         require(naverUrl.isNotBlank()) { "NAVER_BASE_URL이 설정되지 않았습니다." }
         require(newsSortOrder.isNotBlank()) {"NAER_NEWS_SORT가 제대로 설정되지않았습니다"}
     }
-
 
     @Async("newsExecutor")
     fun fetchNews(keyword: String): CompletableFuture<List<NaverNewsDto>> {
@@ -132,6 +113,4 @@ class NaverNewsService(
             } else null
         }
     }
-
-
 }

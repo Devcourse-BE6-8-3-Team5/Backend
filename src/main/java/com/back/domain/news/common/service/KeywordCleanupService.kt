@@ -9,11 +9,9 @@ import java.time.LocalDate
 
 @Service
 class KeywordCleanupService(
-    private val keywordHistoryRepository: KeywordHistoryRepository
+    private val keywordHistoryRepository: KeywordHistoryRepository,
+    @Value("\${keyword.cleanup.retention-days}") private val retentionDays: Int
 ) {
-    @Value("\${keyword.cleanup.retention-days}")
-    private val retentionDays = 0
-
     companion object {
         val log = LoggerFactory.getLogger(KeywordCleanupService::class.java)
     }
