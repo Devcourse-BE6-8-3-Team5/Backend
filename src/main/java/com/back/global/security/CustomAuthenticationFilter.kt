@@ -42,7 +42,8 @@ class CustomAuthenticationFilter(
     private val authRequiredPaths = setOf(
         "/api/members/info",
         "/api/members/logout",
-        "/api/members/withdraw"
+        "/api/members/withdraw",
+        "/api/quiz/histories"
     )
 
     override fun doFilterInternal(request: HttpServletRequest, response: HttpServletResponse, filterChain: FilterChain) {
@@ -101,6 +102,7 @@ class CustomAuthenticationFilter(
         return uri.startsWith("/api/quiz/detail/") ||
                 uri.startsWith("/api/quiz/daily/") ||
                 uri.startsWith("/api/admin/") ||
+                uri.startsWith("/api/histories")
                 uri in authRequiredPaths ||
                 (method == "GET" && uri.matches(Regex("/api/quiz/fact/\\d+"))) ||
                 (method == "POST" && uri.matches(Regex("/api/quiz/fact/submit/\\d+")))

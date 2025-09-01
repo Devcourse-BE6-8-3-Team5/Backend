@@ -35,14 +35,14 @@ public class QuizHistoryService {
     @Transactional
     public void save(Member actor, Long id,QuizType quizType, String answer, boolean isCorrect, int gainExp) {
 
-        QuizHistory quizHistory = QuizHistory.builder()
-                .member(actor)
-                .quizId(id)
-                .quizType(quizType)
-                .answer(answer)
-                .isCorrect(isCorrect)
-                .gainExp(gainExp)
-                .build();
+        QuizHistory quizHistory = new QuizHistory(
+                actor,
+                id,
+                quizType,
+                answer,
+                isCorrect,
+                gainExp
+        );
 
         // 퀴즈 히스토리 저장
         try {
