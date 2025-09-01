@@ -46,9 +46,12 @@ public class DailyQuizEventListenerTest {
     @Autowired
     private TransactionTemplate transactionTemplate;
 
+    private int initialQuizCount;
+
     @BeforeEach
-    void setupAndClearData() {
+    void setup() {
         dailyQuizRepository.deleteAll();
+        initialQuizCount = (int) dailyQuizRepository.count();
     }
 
     @Test
@@ -75,7 +78,7 @@ public class DailyQuizEventListenerTest {
             assertThat(dailyQuiz.getTodayNews().getId()).isEqualTo(todayNewsId);
             assertThat(dailyQuiz.getTodayNews().getSelectedDate()).isEqualTo(LocalDate.now());
             assertThat(dailyQuiz.getDetailQuiz()).isNotNull();
-            assertThat(dailyQuiz.getDetailQuiz().getRealNews().getId()).isEqualTo(todayNewsId);
+            assertThat(dailyQuiz.getDetailQuiz().realNews.getId()).isEqualTo(todayNewsId);
         });
     }
 
@@ -101,7 +104,7 @@ public class DailyQuizEventListenerTest {
             assertThat(dailyQuiz.getTodayNews()).isNotNull();
             assertThat(dailyQuiz.getTodayNews().getId()).isEqualTo(todayNewsId);
             assertThat(dailyQuiz.getDetailQuiz()).isNotNull();
-            assertThat(dailyQuiz.getDetailQuiz().getRealNews().getId()).isEqualTo(todayNewsId);
+            assertThat(dailyQuiz.getDetailQuiz().realNews.getId()).isEqualTo(todayNewsId);
         });
     }
 
@@ -114,8 +117,6 @@ public class DailyQuizEventListenerTest {
         // 첫 번째 퀴즈 생성
         eventPublisher.publishEvent(new TodayNewsCreatedEvent(todayNewsId));
         waitForAsyncCompletion();
-
-        long initialQuizCount = dailyQuizRepository.count();
 
         // When - 동일한 이벤트를 다시 발행
         eventPublisher.publishEvent(new TodayNewsCreatedEvent(todayNewsId));
@@ -139,8 +140,8 @@ public class DailyQuizEventListenerTest {
         }).doesNotThrowAnyException();
 
         // 퀴즈가 생성되지 않았는지 확인
-        List<DailyQuiz> dailyQuizzes = dailyQuizRepository.findAll();
-        assertThat(dailyQuizzes).isEmpty();
+        long finalQuizCount = dailyQuizRepository.count();
+        assertThat(finalQuizCount).isEqualTo(initialQuizCount);
     }
 
     @Test
@@ -156,8 +157,8 @@ public class DailyQuizEventListenerTest {
         }).doesNotThrowAnyException();
 
         // 퀴즈가 생성되지 않았는지 확인
-        List<DailyQuiz> dailyQuizzes = dailyQuizRepository.findAll();
-        assertThat(dailyQuizzes).isEmpty();
+        long finalQuizCount = dailyQuizRepository.count();
+        assertThat(finalQuizCount).isEqualTo(initialQuizCount);
     }
 
     @Test
