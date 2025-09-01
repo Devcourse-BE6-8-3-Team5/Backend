@@ -88,8 +88,6 @@ kapt {
     arguments {
         arg("querydsl.entityAccessors", "true")
         arg("querydsl.kotlin.entityAccessors", "true")
-        arg("kapt.include.compile.classpath", "false")
-        arg("kapt.use.jvm.target.from.kotlin.compiler", "true")
     }
 }
 
