@@ -1,6 +1,7 @@
 package com.back.domain.news.common.service
 
 import com.back.domain.news.common.repository.KeywordHistoryRepository
+import jakarta.annotation.PostConstruct
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
@@ -14,6 +15,11 @@ class KeywordCleanupService(
 ) {
     companion object {
         val log = LoggerFactory.getLogger(KeywordCleanupService::class.java)
+    }
+
+    @PostConstruct
+    fun validateConfig() {
+        require(retentionDays in 1..30) { "KEYWORD_CLEANUP_RETENTION_DAYS는 1에서 30 사이여야 합니다." }
     }
 
     @Transactional

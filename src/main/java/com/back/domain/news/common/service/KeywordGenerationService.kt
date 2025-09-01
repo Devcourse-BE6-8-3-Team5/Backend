@@ -7,6 +7,7 @@ import com.back.domain.news.common.enums.KeywordType
 import com.back.global.ai.AiService
 import com.back.global.ai.processor.KeywordGeneratorProcessor
 import com.fasterxml.jackson.databind.ObjectMapper
+import jakarta.annotation.PostConstruct
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
@@ -26,6 +27,15 @@ class KeywordGenerationService(
     companion object{
         private val log = LoggerFactory.getLogger(KeywordGenerationService::class.java)
     }
+
+    @PostConstruct
+    fun validateConfig() {
+        require(overuseDays in 1..30) { "KEYWORD_OVERUSE_DAYS는 1에서 30 사이여야 합니다." }
+        require(overuseThreshold in 1..30) { "KEYWORD_OVERUSE_THRESHOLD는 1에서 30 사이여야 합니다." }
+        require(recentDays in 1..30) { "KEYWORD_OVERUSE_RECENT-DAYS는  1에서 30 사이여야 합니다." }
+
+    }
+
 
     fun generateTodaysKeywords(): KeywordGenerationResDto {
         val today = LocalDate.now()

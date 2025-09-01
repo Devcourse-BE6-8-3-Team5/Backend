@@ -2,6 +2,7 @@ package com.back.domain.news.real.service
 
 import com.back.domain.news.common.dto.AnalyzedNewsDto
 import com.back.domain.news.real.dto.RealNewsDto
+import jakarta.annotation.PostConstruct
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.task.TaskRejectedException
@@ -17,6 +18,11 @@ class NewsAnalysisService(
 ) {
     companion object {
         private val log = LoggerFactory.getLogger(NewsAnalysisService::class.java)
+    }
+
+    @PostConstruct
+    fun validateConfig() {
+        require(batchSize in 1..3) { "batchSize를 1에서 3사이로 설정하세요" }
     }
 
     fun filterAndScoreNews(allRealNewsBeforeFilter: List<RealNewsDto>?): List<AnalyzedNewsDto> {

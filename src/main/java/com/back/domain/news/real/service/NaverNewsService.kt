@@ -38,15 +38,16 @@ class NaverNewsService(
         private val log = LoggerFactory.getLogger(NaverNewsService::class.java)
     }
 
-    // 서비스 초기화 시 설정값 검증
     @PostConstruct
     fun validateConfig() {
         require(clientId.isNotBlank()) { "NAVER_CLIENT_ID가 설정되지 않았습니다." }
         require( clientSecret.isNotBlank()) { "NAVER_CLIENT_SECRET가 설정되지 않았습니다." }
-        require(newsDisplayCount in 1..99) { "NAVER_NEWS_DISPLAY_COUNT는 100이하의 값이어야 합니다." }
+        require(newsDisplayCount in 1..99) { "NAVER_NEWS_DISPLAY_COUNT는 100보다 작아야 합니다." }
         require(crawlingDelay >= 0) { "NAVER_CRAWLING_DELAY는 0 이상이어야 합니다." }
         require(naverUrl.isNotBlank()) { "NAVER_BASE_URL이 설정되지 않았습니다." }
-        require(newsSortOrder.isNotBlank()) {"NAER_NEWS_SORT가 제대로 설정되지않았습니다"}
+        require(newsSortOrder.isNotBlank()) {"NAER_NEWS_SORT가 제대로 설정되지 않았습니다"}
+        require(descriptionSimilarityThreshold in (0.01..0.99)) { "NEWS_DEDUP_DESCRIPTION_THRESHOLD는 0보다 크고 1보다 작아야 합니다." }
+        require(titleSimilarityThreshold in (0.01..0.99)) { "NEWS_DEDUP_TITLE_THRESHOLD는 0보다 크고 1보다 작아야 합니다" }
     }
 
     @Async("newsExecutor")

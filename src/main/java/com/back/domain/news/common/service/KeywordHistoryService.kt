@@ -5,14 +5,12 @@ import com.back.domain.news.common.dto.KeywordWithType
 import com.back.domain.news.common.entity.KeywordHistory
 import com.back.domain.news.common.enums.NewsCategory
 import com.back.domain.news.common.repository.KeywordHistoryRepository
-import lombok.RequiredArgsConstructor
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
 
 
 @Service
-@RequiredArgsConstructor
 class KeywordHistoryService(private val keywordHistoryRepository: KeywordHistoryRepository) {
 
     @Transactional
