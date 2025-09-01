@@ -141,7 +141,7 @@ public class FactQuizControllerTest {
 
                 .andExpect(jsonPath("$.data.answer").doesNotExist())
                 .andExpect(jsonPath("$.data.gainExp").exists())
-                .andExpect(jsonPath("$.data.correct").exists());
+                .andExpect(jsonPath("$.data.isCorrect").exists());
 
 
     }
@@ -222,7 +222,7 @@ public class FactQuizControllerTest {
                 .andExpect(jsonPath("$.data.quizId").value(quizId))
                 .andExpect(jsonPath("$.data.selectedNewsType").value("REAL"))
                 .andExpect(jsonPath("$.data.correctNewsType").exists())
-                .andExpect(jsonPath("$.data.correct").isBoolean())
+                .andExpect(jsonPath("$.data.isCorrect").isBoolean())
                 .andExpect(jsonPath("$.data.gainExp").isNumber())
                 .andExpect(jsonPath("$.data.quizType").value("FACT"));
     }

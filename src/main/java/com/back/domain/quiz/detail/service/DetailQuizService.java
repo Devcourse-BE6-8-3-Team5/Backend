@@ -117,6 +117,7 @@ public class DetailQuizService {
                 .orElseThrow(() -> new ServiceException(404, "해당 id의 뉴스가 존재하지 않습니다. id: " + newsId));
 
         detailQuizRepository.deleteByRealNewsId(newsId); // 기존 퀴즈 삭제
+        news.getDetailQuizzes().clear();
 
         List<DetailQuiz> savedQuizzes = quizzes.stream()
                 .map(dto -> {
@@ -138,11 +139,11 @@ public class DetailQuizService {
         DetailQuiz quiz = detailQuizRepository.findById(id)
                 .orElseThrow(() -> new ServiceException(404, "해당 id의 상세 퀴즈가 존재하지 않습니다. id: " + id));
 
-        quiz.setQuestion(detailQuizDto.question());
-        quiz.setOption1(detailQuizDto.option1());
-        quiz.setOption2(detailQuizDto.option2());
-        quiz.setOption3(detailQuizDto.option3());
-        quiz.setCorrectOption(detailQuizDto.correctOption());
+        quiz.setQuestion(detailQuizDto.getQuestion());
+        quiz.setOption1(detailQuizDto.getOption1());
+        quiz.setOption2(detailQuizDto.getOption2());
+        quiz.setOption3(detailQuizDto.getOption3());
+        quiz.setCorrectOption(detailQuizDto.getCorrectOption());
 
         return detailQuizRepository.save(quiz);
     }

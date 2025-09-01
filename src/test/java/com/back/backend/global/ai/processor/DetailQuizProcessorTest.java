@@ -6,6 +6,7 @@ import com.back.domain.quiz.detail.entity.Option;
 import com.back.global.ai.processor.DetailQuizProcessor;
 import com.back.global.exception.ServiceException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.module.kotlin.KotlinModule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -22,7 +23,7 @@ import static org.mockito.Mockito.when;
 
 class DetailQuizProcessorTest {
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private final ObjectMapper objectMapper = new ObjectMapper().registerModule(new KotlinModule.Builder().build());
     private DetailQuizCreateReqDto defaultRequest;
 
     @BeforeEach
@@ -87,13 +88,13 @@ class DetailQuizProcessorTest {
         // then
         assertThat(result).hasSize(3);
 
-        assertThat(first.question()).isEqualTo("Qwen3-Coder는 어떤 회사가 공개했나요?");
-        assertThat(first.option1()).isEqualTo("알리바바");
-        assertThat(first.option2()).isEqualTo("구글");
-        assertThat(first.option3()).isEqualTo("메타");
-        assertThat(first.correctOption()).isEqualTo(Option.OPTION1);
+        assertThat(first.getQuestion()).isEqualTo("Qwen3-Coder는 어떤 회사가 공개했나요?");
+        assertThat(first.getOption1()).isEqualTo("알리바바");
+        assertThat(first.getOption2()).isEqualTo("구글");
+        assertThat(first.getOption3()).isEqualTo("메타");
+        assertThat(first.getCorrectOption()).isEqualTo(Option.OPTION1);
 
-        assertThat(result.get(1).correctOption()).isEqualTo(Option.OPTION2);
+        assertThat(result.get(1).getCorrectOption()).isEqualTo(Option.OPTION2);
     }
 
     @Test

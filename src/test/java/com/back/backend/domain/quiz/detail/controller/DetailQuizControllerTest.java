@@ -9,6 +9,7 @@ import com.back.domain.quiz.detail.entity.Option;
 import com.back.global.rq.Rq;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -82,7 +83,7 @@ class DetailQuizControllerTest {
 
                 .andExpect(jsonPath("$.data.answer").doesNotExist())
                 .andExpect(jsonPath("$.data.gainExp").exists())
-                .andExpect(jsonPath("$.data.correct").exists())
+                .andExpect(jsonPath("$.data.isCorrect").exists())
                 .andExpect(jsonPath("$.data.quizType").value("DETAIL"));
 
     }
@@ -166,6 +167,7 @@ class DetailQuizControllerTest {
 
     @Test
     @DisplayName("POST /api/quiz/detail/news/{newsId}/regenerate - 뉴스 ID로 상세 퀴즈 생성")
+    @Disabled("실제 AI 호출 테스트 - 필요할 때만 실행")
     void t7() throws Exception {
         // Given
         Long newsId = 1L;
@@ -227,7 +229,7 @@ class DetailQuizControllerTest {
                 .andExpect(jsonPath("$.message").value("퀴즈 정답 제출 성공"))
                 .andExpect(jsonPath("$.data.quizId").value(quizId))
                 .andExpect(jsonPath("$.data.selectedOption").value("OPTION2"))
-                .andExpect(jsonPath("$.data.correct").value(true))
+                .andExpect(jsonPath("$.data.isCorrect").value(true))
                 .andExpect(jsonPath("$.data.gainExp").value(10))
                 .andExpect(jsonPath("$.data.quizType").value("DETAIL"));
     }
@@ -252,7 +254,7 @@ class DetailQuizControllerTest {
                 .andExpect(jsonPath("$.message").value("퀴즈 정답 제출 성공"))
                 .andExpect(jsonPath("$.data.quizId").value(quizId))
                 .andExpect(jsonPath("$.data.selectedOption").value("OPTION1"))
-                .andExpect(jsonPath("$.data.correct").value(false))
+                .andExpect(jsonPath("$.data.isCorrect").value(false))
                 .andExpect(jsonPath("$.data.gainExp").value(0))
                 .andExpect(jsonPath("$.data.quizType").value("DETAIL"));
     }
