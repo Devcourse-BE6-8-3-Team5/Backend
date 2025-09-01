@@ -50,7 +50,7 @@ public class DetailQuizEventListenerTest {
     }
 
     @Test
-    @DisplayName("")
+    @DisplayName("RealNewsCreatedEvent가 발행되면 상세 퀴즈가 생성되어 DB에 저장됨")
     @Disabled("실제 AI 호출 테스트 - 필요할 때만 실행")
     void t1(){
         // Given
@@ -80,7 +80,7 @@ public class DetailQuizEventListenerTest {
     }
 
     @Test
-    @DisplayName("")
+    @DisplayName("존재하지 않는 RealNews ID로 이벤트 발행시 퀴즈가 생성되지 않음")
     void t2(){
         // Given
         List<Long> newsIds = List.of(999L);
