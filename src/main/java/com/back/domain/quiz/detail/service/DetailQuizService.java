@@ -117,6 +117,7 @@ public class DetailQuizService {
                 .orElseThrow(() -> new ServiceException(404, "해당 id의 뉴스가 존재하지 않습니다. id: " + newsId));
 
         detailQuizRepository.deleteByRealNewsId(newsId); // 기존 퀴즈 삭제
+        news.getDetailQuizzes().clear();
 
         List<DetailQuiz> savedQuizzes = quizzes.stream()
                 .map(dto -> {
