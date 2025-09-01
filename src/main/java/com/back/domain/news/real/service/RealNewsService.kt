@@ -56,7 +56,7 @@ class RealNewsService(
         val excludedId = todayNewsOrRecent
         val unsortedPageable = PageRequest.of(pageable.pageNumber, pageable.pageSize)
 
-        return realNewsRepository.findAllExcludingNth(excludedId, n + 1, unsortedPageable)
+        return realNewsRepository.findQAllExcludingNth(excludedId, n + 1, unsortedPageable)
             .map { realNews -> realNewsMapper.toDto(realNews) }
     }
 
@@ -65,7 +65,7 @@ class RealNewsService(
         val excludedId = todayNewsOrRecent
         val unsortedPageable = PageRequest.of(pageable.pageNumber, pageable.pageSize)
 
-        return realNewsRepository.findByTitleExcludingNthCategoryRank(title, excludedId, n + 1, unsortedPageable)
+        return realNewsRepository.findQByTitleExcludingNthCategoryRank(title, excludedId, n + 1, unsortedPageable)
             .map { realNews -> realNewsMapper.toDto(realNews) }
     }
 
@@ -74,7 +74,7 @@ class RealNewsService(
         val excludedId = todayNewsOrRecent
         val unsortedPageable = PageRequest.of(pageable.pageNumber, pageable.pageSize)
 
-        return realNewsRepository.findByCategoryExcludingNth(category, excludedId, n + 1, unsortedPageable)
+        return realNewsRepository.findQByCategoryExcludingNth(category, excludedId, n + 1, unsortedPageable)
             .map { realNews -> realNewsMapper.toDto(realNews) }
     }
 
