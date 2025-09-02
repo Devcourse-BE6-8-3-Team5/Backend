@@ -29,6 +29,7 @@ class DailyQuizController(
     @ApiResponses(
         value = [
             ApiResponse(responseCode = "200", description = "오늘의 퀴즈 조회 성공"),
+            ApiResponse(responseCode = "401", description = "로그인이 필요합니다."),
             ApiResponse(
                 responseCode = "404",
                 description = "오늘의 뉴스에 해당하는 오늘의 퀴즈가 존재하지 않음",
@@ -36,7 +37,7 @@ class DailyQuizController(
                     Content(
                         mediaType = "application/json",
                         schema = Schema(implementation = RsData::class),
-                        examples = [ExampleObject(value = "{\"resultCode\": 404, \"msg\": \"오늘의 뉴스에 해당하는 오늘 퀴즈가 존재하지 않습니다.\", \"data\": null}")]
+                        examples = [ExampleObject(value = "{\"code\": 404, \"msg\": \"오늘의 뉴스에 해당하는 오늘 퀴즈가 존재하지 않습니다.\", \"data\": null}")]
                     )
                 )
             )
