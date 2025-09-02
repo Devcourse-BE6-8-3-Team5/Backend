@@ -15,8 +15,6 @@ class DetailQuizEventService(
     private val realNewsRepository: RealNewsRepository,
     private val publisher: ApplicationEventPublisher
 ) {
-    private val log = LoggerFactory.getLogger(FactQuizService::class.java)
-
     fun generateDetailQuizzes(realNewsIds: List<Long>) {
         val realNewsList: List<RealNews> = realNewsRepository.findAllById(realNewsIds)
 
@@ -42,5 +40,9 @@ class DetailQuizEventService(
         } catch (e: Exception) {
             log.error("일부 퀴즈 생성 작업이 실패했습니다.", e)
         }
+    }
+
+    companion object {
+        private val log = LoggerFactory.getLogger(DetailQuizAsyncService::class.java)
     }
 }
