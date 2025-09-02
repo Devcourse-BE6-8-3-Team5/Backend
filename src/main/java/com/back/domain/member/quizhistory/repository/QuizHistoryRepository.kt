@@ -7,6 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository
 
 interface QuizHistoryRepository : JpaRepository<QuizHistory, Long> {
     fun findByMember(actor: Member): List<QuizHistory>
-    fun findByMemberAndQuizTypeAndQuizIdIn(member: Member, quizType: QuizType, quizIds: MutableSet<Long>
+    fun findByMemberAndQuizTypeAndQuizIdIn(member: Member, quizType: QuizType, quizIds: Set<Long>
     ): MutableList<QuizHistory>
 }
