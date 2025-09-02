@@ -3,7 +3,6 @@ package com.back.domain.quiz.detail.service
 import com.back.domain.news.real.entity.RealNews
 import com.back.domain.news.real.repository.RealNewsRepository
 import com.back.domain.quiz.detail.event.DetailQuizCreatedEvent
-import com.back.domain.quiz.fact.service.FactQuizService
 import org.slf4j.LoggerFactory
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.stereotype.Service
