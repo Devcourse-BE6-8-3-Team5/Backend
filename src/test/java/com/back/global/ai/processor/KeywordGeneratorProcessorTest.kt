@@ -1,10 +1,9 @@
-package com.back.backend.global.ai.processor
+package com.back.global.ai.processor
 
 
 import com.back.domain.news.common.dto.KeywordGenerationReqDto
 import com.back.domain.news.common.dto.KeywordGenerationResDto
 import com.back.domain.news.common.enums.KeywordType
-import com.back.global.ai.processor.KeywordGeneratorProcessor
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.mockk.every
 import io.mockk.mockk

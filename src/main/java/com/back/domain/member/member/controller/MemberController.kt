@@ -26,7 +26,6 @@ class MemberController(
     private val rq: Rq
 ) {
 
-    @JvmRecord
     data class JoinReqBody(
         @field:NotBlank @field:Size(min = 2, max = 30, message = "이름은 최소 2자 이상이어야 합니다.") val name: String,
         @field:NotBlank @field:Size(min = 10, max = 50) val password: String,
@@ -56,14 +55,12 @@ class MemberController(
 
 
     // 로그인 요청 시 (이메일, 비밀번호)
-    @JvmRecord
     data class LoginReqBody(
         @field:NotBlank @field:Email(message = "유효한 이메일 형식이어야 합니다.") val email: String,
         @field:NotBlank val password: String
     )
 
     // 로그인 응답 시 (MemberWithAuthDto, apiKey, accessToken)
-    @JvmRecord
     data class LoginResBody(
         val member: MemberWithAuthDto?,
         val apiKey: String?,
@@ -136,7 +133,6 @@ class MemberController(
         )
     }
 
-    @JvmRecord
     data class ModifyReqBody(
         @field:NotBlank @field:Size(min = 2, max = 30, message = "이름은 최소 2자 이상이어야 합니다.") val name: String,
         @field:NotBlank @field:Size(min = 10, max = 50) val password: String,

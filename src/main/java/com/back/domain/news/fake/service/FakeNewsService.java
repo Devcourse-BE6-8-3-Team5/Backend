@@ -14,7 +14,8 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -32,11 +33,12 @@ import java.util.stream.Collectors;
 import static java.util.concurrent.CompletableFuture.*;
 import static java.util.concurrent.CompletableFuture.completedFuture;
 
-@Slf4j
+
 @Service
 @RequiredArgsConstructor
 public class FakeNewsService {
 
+    private static final Logger log = LoggerFactory.getLogger(FakeNewsService.class);
     private final AiService aiService;
     private final ObjectMapper objectMapper;
     private final FakeNewsRepository fakeNewsRepository;
@@ -120,10 +122,10 @@ public class FakeNewsService {
 
         // FakeNews 엔티티들 생성 후 저장
         List<FakeNews> fakeNewsList = fakeNewsDtos.stream()
-                .filter(dto -> realNewsMap.containsKey(dto.realNewsId())) // 존재하는 realNewsId만 필터링
+                .filter(dto -> realNewsMap.containsKey(dto.realNewsId)) // 존재하는 realNewsId만 필터링
                 .map(dto -> FakeNews.builder()
-                        .realNews(realNewsMap.get(dto.realNewsId()))
-                        .content(dto.content())
+                        .realNews(realNewsMap.get(dto.realNewsId))
+                        .content(dto.content)
                         .build())
                 .collect(Collectors.toList());
 
@@ -147,40 +149,40 @@ public class FakeNewsService {
 
             for (FakeNewsDto dto : fakeNewsDtos) {
                 try {
-                    log.debug("처리 중: realNewsId={}", dto.realNewsId());
+                    log.debug("처리 중: realNewsId={}", dto.realNewsId);
 
                     // 1. 이미 존재하는지 확인
-                    if (fakeNewsRepository.existsById(dto.realNewsId())) {
-                        log.debug("FakeNews 이미 존재 - ID: {}", dto.realNewsId());
+                    if (fakeNewsRepository.existsById(dto.realNewsId)) {
+                        log.debug("FakeNews 이미 존재 - ID: {}", dto.realNewsId);
                         skipCount++;
                         continue;
                     }
 
                     // 2. RealNews 프록시 객체 생성 (실제 DB 조회 없음, Lazy Loading)
-                    RealNews realNewsProxy = realNewsRepository.getReferenceById(dto.realNewsId());
+                    RealNews realNewsProxy = realNewsRepository.getReferenceById(dto.realNewsId);
 
                     // 3. FakeNews 생성 및 저장
                     FakeNews fakeNews = FakeNews.builder()
-                            .id(dto.realNewsId()) // 명시적 ID 설정 (필수!)
+                            .id(dto.realNewsId) // 명시적 ID 설정 (필수!)
                             .realNews(realNewsProxy) // 프록시 객체 사용
-                            .content(dto.content())
+                            .content(dto.content)
                             .build();
                     entityManager.persist(fakeNews); // merge()가 아닌 persist() 강제
 
                     savedCount++;
-                    log.info("FakeNews 저장 성공 - ID: {}", dto.realNewsId());
+                    log.info("FakeNews 저장 성공 - ID: {}", dto.realNewsId);
 
                 } catch (DataIntegrityViolationException e) {
                     // 동시성으로 인한 중복 키 에러
-                    log.debug("FakeNews 중복 저장 시도 - ID: {} (동시성 이슈)", dto.realNewsId());
+                    log.debug("FakeNews 중복 저장 시도 - ID: {} (동시성 이슈)", dto.realNewsId);
                     skipCount++;
                 } catch (EntityNotFoundException e) {
                     // RealNews가 존재하지 않 는 경우
-                    log.warn("RealNews 없음 - ID: {}", dto.realNewsId());
+                    log.warn("RealNews 없음 - ID: {}", dto.realNewsId);
                     skipCount++;
                 } catch (Exception e) {
                     errorCount++;
-                    log.error("FakeNews 저장 실패 - ID: {}, 원인: {}", dto.realNewsId(), e.getMessage(), e);
+                    log.error("FakeNews 저장 실패 - ID: {}, 원인: {}", dto.realNewsId, e.getMessage(), e);
                 }
             }
 
