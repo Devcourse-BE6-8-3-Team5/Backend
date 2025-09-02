@@ -53,13 +53,13 @@ class FakeNewsGeneratorProcessorTest {
         mockChatResponseWithText(VALID_JSON_RESPONSE)
 
         // when
-        val result = processor.parseResponse(mockChatResponse)
+        val result: FakeNewsDto = processor.parseResponse(mockChatResponse)
 
         // then
         with(result) {
-            assertThat(FakeNewsDto.realNewsId).isEqualTo(123L)
-            assertThat(FakeNewsDto.content).isEqualTo("Apple이 차세대 M3 프로세서를 발표했다고 16일 공식 발표했다. 새로운 프로세서는 이전 세대 대비 60% 빠른 처리 속도를 자랑하며, 배터리 효율성도 40% 개선됐다. Apple 대변인은 \"혁신적인 기술로 모바일 컴퓨팅의 새 지평을 열겠다\"고 밝혔다. 이에 따라 Apple 주식은 장중 6.8% 급등하며 180달러를 돌파했다.")
-            assertThat(FakeNewsDto.content.length).isBetween(150, 250) // 적절한 길이 범위
+            assertThat(result.realNewsId).isEqualTo(123L)
+            assertThat(result.content).isEqualTo("Apple이 차세대 M3 프로세서를 발표했다고 16일 공식 발표했다. 새로운 프로세서는 이전 세대 대비 60% 빠른 처리 속도를 자랑하며, 배터리 효율성도 40% 개선됐다. Apple 대변인은 \"혁신적인 기술로 모바일 컴퓨팅의 새 지평을 열겠다\"고 밝혔다. 이에 따라 Apple 주식은 장중 6.8% 급등하며 180달러를 돌파했다.")
+            assertThat(result.content.length).isBetween(150, 250) // 적절한 길이 범위
         }
     }
 
@@ -70,13 +70,13 @@ class FakeNewsGeneratorProcessorTest {
         mockChatResponseWithText(JSON_WITH_MARKDOWN)
 
         // when
-        val result = processor.parseResponse(mockChatResponse)
+        val result: FakeNewsDto = processor.parseResponse(mockChatResponse)
 
         // then
         with(result) {
-            assertThat(FakeNewsDto.realNewsId).isEqualTo(123L)
-            assertThat(FakeNewsDto.content).isNotEmpty()
-            assertThat(FakeNewsDto.content).doesNotContain("```")
+            assertThat(result.realNewsId).isEqualTo(123L)
+            assertThat(result.content).isNotEmpty()
+            assertThat(result.content).doesNotContain("```")
         }
     }
 
@@ -88,13 +88,13 @@ class FakeNewsGeneratorProcessorTest {
         mockChatResponseWithText(response)
 
         // when
-        val result = processor.parseResponse(mockChatResponse)
+        val result: FakeNewsDto = processor.parseResponse(mockChatResponse)
 
         // then
         with(result) {
-            assertThat(FakeNewsDto.realNewsId).isEqualTo(123L)
-            assertThat(FakeNewsDto.content).contains("AI 생성에 실패하여 안내문으로 대체되었습니다")
-            assertThat(FakeNewsDto.content).contains("시스템 관리자에게 문의")
+            assertThat(result.realNewsId).isEqualTo(123L)
+            assertThat(result.content).contains("AI 생성에 실패하여 안내문으로 대체되었습니다")
+            assertThat(result.content).contains("시스템 관리자에게 문의")
         }
     }
 
@@ -105,13 +105,13 @@ class FakeNewsGeneratorProcessorTest {
         every { mockChatResponse.result } returns null
 
         // when
-        val result = processor.parseResponse(mockChatResponse)
+        val result: FakeNewsDto = processor.parseResponse(mockChatResponse)
 
         // then
         with(result) {
-            assertThat(FakeNewsDto.realNewsId).isEqualTo(123L)
-            assertThat(FakeNewsDto.content).contains("AI 응답이 비어있습니다")
-            assertThat(FakeNewsDto.content).contains("안내문으로 대체되었습니다")
+            assertThat(result.realNewsId).isEqualTo(123L)
+            assertThat(result.content).contains("AI 응답이 비어있습니다")
+            assertThat(result.content).contains("안내문으로 대체되었습니다")
         }
     }
 
@@ -122,12 +122,12 @@ class FakeNewsGeneratorProcessorTest {
         mockChatResponseWithText(NULL_CONTENT_RESPONSE)
 
         // when
-        val result = processor.parseResponse(mockChatResponse)
+        val result: FakeNewsDto = processor.parseResponse(mockChatResponse)
 
         // then
         with(result) {
-            assertThat(FakeNewsDto.realNewsId).isEqualTo(123L)
-            assertThat(FakeNewsDto.content).contains("content가 누락되었습니다")
+            assertThat(result.realNewsId).isEqualTo(123L)
+            assertThat(result.content).contains("content가 누락되었습니다")
         }
     }
 
@@ -138,12 +138,11 @@ class FakeNewsGeneratorProcessorTest {
         mockChatResponseWithText(EMPTY_CONTENT_RESPONSE)
 
         // when
-        val result = processor.parseResponse(mockChatResponse)
-
+        val result: FakeNewsDto = processor.parseResponse(mockChatResponse)
         // then
         with(result) {
-            assertThat(FakeNewsDto.realNewsId).isEqualTo(123L)
-            assertThat(FakeNewsDto.content).contains("content가 누락되었습니다")
+            assertThat(result.realNewsId).isEqualTo(123L)
+            assertThat(result.content).contains("content가 누락되었습니다")
         }
     }
 
@@ -179,12 +178,12 @@ class FakeNewsGeneratorProcessorTest {
         mockChatResponseWithText(VALID_JSON_RESPONSE)
 
         // when
-        val result = processorWithFaultyMapper.parseResponse(mockChatResponse)
+        val result: FakeNewsDto = processorWithFaultyMapper.parseResponse(mockChatResponse)
 
         // then
         with(result) {
-            assertThat(FakeNewsDto.realNewsId).isEqualTo(123L)
-            assertThat(FakeNewsDto.content).contains("AI 응답 파싱 실패")
+            assertThat(result.realNewsId).isEqualTo(123L)
+            assertThat(result.content).contains("AI 응답 파싱 실패")
         }
     }
 
@@ -196,13 +195,13 @@ class FakeNewsGeneratorProcessorTest {
         mockChatResponseWithText(COMPLEX_JSON_RESPONSE)
 
         // when
-        val result = realProcessor.parseResponse(mockChatResponse)
+        val result: FakeNewsDto = realProcessor.parseResponse(mockChatResponse)
 
         // then
         with(result) {
-            assertThat(FakeNewsDto.realNewsId).isEqualTo(123L)
-            assertThat(FakeNewsDto.content).isEqualTo("구글이 새로운 검색 알고리즘을 도입한다고 17일 발표했다. 이번 알고리즘은 사용자 경험을 크게 개선할 것으로 기대된다. 구글 엔지니어링 팀은 \"검색 정확도가 대폭 향상될 것\"이라고 설명했다. 업계에서는 이번 변화가 검색 시장에 큰 영향을 줄 것으로 예상한다고 밝혔다.")
-            assertThat(FakeNewsDto.content).doesNotContain("\\\\n") // 이스케이프 문자가 그대로 남아있지 않는지 확인
+            assertThat(result.realNewsId).isEqualTo(123L)
+            assertThat(result.content).isEqualTo("구글이 새로운 검색 알고리즘을 도입한다고 17일 발표했다. 이번 알고리즘은 사용자 경험을 크게 개선할 것으로 기대된다. 구글 엔지니어링 팀은 \"검색 정확도가 대폭 향상될 것\"이라고 설명했다. 업계에서는 이번 변화가 검색 시장에 큰 영향을 줄 것으로 예상한다고 밝혔다.")
+            assertThat(result.content).doesNotContain("\\\\n") // 이스케이프 문자가 그대로 남아있지 않는지 확인
         }
     }
 
@@ -213,14 +212,14 @@ class FakeNewsGeneratorProcessorTest {
         mockChatResponseWithText(SPECIAL_CHARACTERS_RESPONSE)
 
         // when
-        val result = processor.parseResponse(mockChatResponse)
+        val result: FakeNewsDto = processor.parseResponse(mockChatResponse)
 
         // then
         with(result) {
-            assertThat(FakeNewsDto.realNewsId).isEqualTo(123L)
-            assertThat(FakeNewsDto.content).contains("\"혁신적인 기술\"")
-            assertThat(FakeNewsDto.content).contains("50% 증가")
-            assertThat(FakeNewsDto.content).contains("AI\\\\n\\\\n새로운 시대")
+            assertThat(result.realNewsId).isEqualTo(123L)
+            assertThat(result.content).contains("\"혁신적인 기술\"")
+            assertThat(result.content).contains("50% 증가")
+            assertThat(result.content).contains("AI\\\\n\\\\n새로운 시대")
         }
     }
 

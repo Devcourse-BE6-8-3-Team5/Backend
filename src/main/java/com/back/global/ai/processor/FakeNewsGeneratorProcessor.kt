@@ -146,7 +146,7 @@ class FakeNewsGeneratorProcessor(
             if (content.isNullOrBlank()) {
                 createFailureNotice("AI 응답에 content가 누락되었습니다")
             } else {
-                FakeNewsDto.of(realNewsDto.id, content)
+                FakeNewsDto(realNewsDto.id, content)
             }
         }.getOrElse { e ->
             log.error("JSON 파싱 실패: {}", e.message)
@@ -163,7 +163,7 @@ class FakeNewsGeneratorProcessor(
             시스템 관리자에게 문의하거나 나중에 다시 시도해 주세요.
         """.trimIndent()
 
-        return FakeNewsDto.of(realNewsDto.id, failureContent)
+        return FakeNewsDto(realNewsDto.id, failureContent)
     }
 
 

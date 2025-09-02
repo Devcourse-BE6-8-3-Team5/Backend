@@ -10,7 +10,7 @@ import java.time.LocalDate
 class TodayNews(
     var selectedDate: LocalDate,
 
-    @field:JsonIgnore
+    @get:JsonIgnore
     @field:JoinColumn(name = "real_news_id")
     @field:MapsId
     @field:OneToOne(fetch = FetchType.LAZY)
@@ -21,6 +21,6 @@ class TodayNews(
 
     // 오늘의 퀴즈와 1:N 관계 설정
     @field:OneToMany(mappedBy = "todayNews", cascade = [CascadeType.ALL], orphanRemoval = true)
-    @field:JsonIgnore
+    @get:JsonIgnore
     val todayQuizzes: MutableList<DailyQuiz> = mutableListOf()
 }
