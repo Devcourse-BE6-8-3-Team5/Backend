@@ -62,7 +62,7 @@ class NewsDataService(
     }
 
     // 네이버 API를 통해 메타데이터 수집
-    fun collectMetaDataFromNaver(keywords: MutableList<String>): List<NaverNewsDto> {
+    fun collectMetaDataFromNaver(keywords: List<String>): List<NaverNewsDto> {
         log.info("네이버 API 호출 시작: {} 개 키워드", keywords.size)
         val futures = keywords.map { keyword -> naverNewsService.fetchNews(keyword)}
 

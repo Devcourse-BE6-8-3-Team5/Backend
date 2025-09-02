@@ -34,7 +34,6 @@ class FakeNewsService(
         private val log: Logger = LoggerFactory.getLogger(FakeNewsService::class.java)
     }
 
-    @Async("newsExecutor")
     fun generateFakeNewsBatch(realNewsDtos: List<RealNewsDto>): CompletableFuture<List<FakeNewsDto>> {
         if (realNewsDtos.isEmpty()) {
             log.warn("생성할 가짜뉴스가 없습니다.")

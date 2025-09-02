@@ -9,7 +9,7 @@ import jakarta.persistence.*
 @Table(
     name = "fake_news",
     indexes = [
-        Index(name = "idx_fake_news_real_news_id", columnList = "real_news_id", unique = true)
+        Index(name = "idx_fake_news_real_news_id", columnList = "real_news_id")
     ]
 )
 class FakeNews(
