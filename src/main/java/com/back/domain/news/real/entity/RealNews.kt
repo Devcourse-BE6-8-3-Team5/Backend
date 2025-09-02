@@ -45,18 +45,18 @@ data class RealNews(
     val id: Long = 0
 ) { // 상세 퀴즈와 1:N 관계 설정 (RealNews 하나 당 3개의 DetailQuiz가 생성됩니다.)
     @field:OneToMany(mappedBy = "realNews", cascade = [CascadeType.ALL], orphanRemoval = true)
-    @JsonIgnore
-    val detailQuizzes: MutableList<DetailQuiz> = mutableListOf()
+    @get:JsonIgnore
+    val detailQuizzes: List<DetailQuiz> = mutableListOf()
 
     @field:OneToMany(mappedBy = "realNews", cascade = [CascadeType.ALL], orphanRemoval = true)
-    @JsonIgnore
-    val factQuizzes: MutableList<FactQuiz> = mutableListOf()
+    @get:JsonIgnore
+    val factQuizzes: List<FactQuiz> = mutableListOf()
 
     @field:OneToOne(mappedBy = "realNews", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
-    @JsonIgnore
+    @get:JsonIgnore
     var fakeNews: FakeNews? = null
 
     @field:OneToOne(mappedBy = "realNews", cascade = [CascadeType.ALL], fetch = FetchType.LAZY)
-    @JsonIgnore
+    @get:JsonIgnore
     var todayNews: TodayNews? = null
 }

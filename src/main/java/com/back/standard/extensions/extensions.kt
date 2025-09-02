@@ -1,5 +1,6 @@
 package com.back.standard.extensions
 
+import com.back.domain.news.common.service.KeepAliveMonitoringService
 import java.nio.charset.StandardCharsets
 import kotlin.io.encoding.Base64
 import kotlin.io.encoding.ExperimentalEncodingApi
@@ -22,4 +23,13 @@ fun String.base64Decode(): String {
 // 모든 nullable 객체에 추가
 fun <T : Any> T?.getOrThrow(): T {
     return this ?: throw NoSuchElementException()
+}
+
+inline fun <T> KeepAliveMonitoringService.executeWithKeepAlive(action: () -> T): T {
+    startBatchKeepAlive()
+    return try {
+        action()
+    } finally {
+        stopBatchKeepAlive()
+    }
 }

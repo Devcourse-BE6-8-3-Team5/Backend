@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.*;
 
 @Profile("!prod")
-@RequiredArgsConstructor
 @RestController
 @RequestMapping("/ntest")
 public class DevTestController {
@@ -25,6 +24,18 @@ public class DevTestController {
     private final RealNewsService realNewsService;
     private final RealNewsRepository realNewsRepository;
     private final KeywordGenerationService keywordGenerationService;
+
+    public DevTestController(DevTestNewsService devTestNewsService, 
+                           NewsDataService newsDataService,
+                           RealNewsService realNewsService,
+                           RealNewsRepository realNewsRepository,
+                           KeywordGenerationService keywordGenerationService) {
+        this.devTestNewsService = devTestNewsService;
+        this.newsDataService = newsDataService;
+        this.realNewsService = realNewsService;
+        this.realNewsRepository = realNewsRepository;
+        this.keywordGenerationService = keywordGenerationService;
+    }
 
 
 
