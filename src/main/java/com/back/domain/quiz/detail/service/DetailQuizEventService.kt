@@ -25,11 +25,9 @@ class DetailQuizEventService(
         log.info("상세 퀴즈 생성 시작. 뉴스 개수: ${realNewsList.size}")
 
         // 모든 뉴스에 대해 비동기 처리 (Rate Limiter가 속도 조절)
-        val futures: List<CompletableFuture<Void>> = realNewsList.map { news ->
-            detailQuizAsyncService.generateAsync(news.id)
-        }
-
-        val allOf = CompletableFuture.allOf(*futures.toTypedArray())
+        val futureMap: Map<Long, CompletableFuture<Void>> =
+            realNewsList.associate { it.id to detailQuizAsyncService.generateAsync(it.id) }
+        val allOf = CompletableFuture.allOf(*futureMap.values.toTypedArray())
 
         try {
             // 비동기 작업이 모두 끝날 때까지 대기
@@ -37,11 +35,12 @@ class DetailQuizEventService(
             log.info("모든 퀴즈 생성 작업이 완료되었습니다.")
             publisher.publishEvent(DetailQuizCreatedEvent())
         } catch (e: Exception) {
-            log.error("일부 퀴즈 생성 작업이 실패했습니다.", e)
+            val failedIds = futureMap.filter { (_, f) -> f.isCompletedExceptionally }.keys
+            log.error("일부 퀴즈 생성 작업 실패. 실패 newsIds: {}", failedIds, e)
         }
     }
 
     companion object {
-        private val log = LoggerFactory.getLogger(DetailQuizAsyncService::class.java)
+        private val log = LoggerFactory.getLogger(DetailQuizEventService::class.java)
     }
 }

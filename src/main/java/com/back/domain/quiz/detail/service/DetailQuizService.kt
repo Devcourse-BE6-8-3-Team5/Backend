@@ -16,7 +16,6 @@ import com.back.global.ai.processor.DetailQuizProcessor
 import com.back.global.exception.ServiceException
 import com.back.global.util.LevelSystem.calculateLevel
 import com.fasterxml.jackson.databind.ObjectMapper
-import org.slf4j.LoggerFactory
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -30,8 +29,6 @@ class DetailQuizService(
     private val quizHistoryRepository: QuizHistoryRepository,
     private val memberRepository: MemberRepository
 ) {
-    private val log = LoggerFactory.getLogger(DetailQuizService::class.java)
-
     fun count(): Long {
         return detailQuizRepository.count()
     }
@@ -67,10 +64,9 @@ class DetailQuizService(
 
     @Transactional(readOnly = true)
     fun findByNewsId(newsId: Long): List<DetailQuiz> {
-        val news = realNewsRepository.findById(newsId)
-            .orElseThrow {
-                ServiceException(404, "해당 id의 뉴스가 존재하지 않습니다. id: $newsId")
-            }
+        if (!realNewsRepository.existsById(newsId)) {
+            throw ServiceException(404, "해당 id의 뉴스가 존재하지 않습니다. id: $newsId")
+        }
 
         val quizzes = detailQuizRepository.findByRealNewsId(newsId)
 
