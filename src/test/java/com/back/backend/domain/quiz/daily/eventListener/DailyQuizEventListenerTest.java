@@ -38,6 +38,8 @@ public class DailyQuizEventListenerTest {
     @Autowired
     private TodayNewsService todayNewsService;
     @Autowired
+    private TodayNewsService todayNewsService;
+    @Autowired
     private DailyQuizRepository dailyQuizRepository;
     @Autowired
     private TodayNewsRepository todayNewsRepository;

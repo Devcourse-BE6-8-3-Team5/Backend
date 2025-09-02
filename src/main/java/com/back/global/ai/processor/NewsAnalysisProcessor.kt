@@ -160,7 +160,7 @@ class NewsAnalysisProcessor(
             val results = rootNode.mapNotNull { itemNode ->
                 runCatching {
                     val newsIndex = itemNode.get("newsIndex")?.asInt()?.takeIf { it in 1..newsToAnalyze.size }
-                    val qualityScore = itemNode.get("qualityScore")?.asInt()
+                    val qualityScore = itemNode.get("qualityScore")?.asInt()?.takeIf{ it in 0..100}
                     val categoryString = itemNode.get("category")?.asText()?.takeIf { it.isNotBlank() }
                     val cleanedContent = itemNode.get("cleanedContent")?.asText()?.takeIf { it.isNotBlank() }
                     val category = categoryString?.let {

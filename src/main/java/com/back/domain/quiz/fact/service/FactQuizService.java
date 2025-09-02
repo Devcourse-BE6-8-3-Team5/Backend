@@ -42,7 +42,7 @@ public class FactQuizService {
 
     @Transactional(readOnly = true)
     public List<FactQuizDto> findByRank(int rank) {
-        List<RealNews> nthRankNews = realNewsRepository.findNthRankByAllCategories(rank);
+        List<RealNews> nthRankNews = realNewsRepository.findQNthRankByAllCategories(rank);
 
         // 해당 뉴스들의 FactQuiz 조회
         return nthRankNews.stream()
@@ -63,13 +63,13 @@ public class FactQuizService {
 
     @Transactional(readOnly = true)
     public Optional<FactQuizDto> findByCategoryAndRank(NewsCategory category, int rank) {
-        Optional<RealNews> realNews = realNewsRepository.findNthRankByCategory(category, rank);
+        RealNews realNews = realNewsRepository.findQNthRankByCategory(category, rank);
 
-        if (realNews.isEmpty()) {
+        if (realNews == null) {
             return Optional.empty();
         }
 
-        return factQuizRepository.findByRealNewsId(realNews.get().getId())
+        return factQuizRepository.findByRealNewsId(realNews.getId())
                 .map(FactQuizDto::new);
 
     }

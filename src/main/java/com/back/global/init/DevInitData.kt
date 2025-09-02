@@ -100,7 +100,7 @@ class DevInitData(
             "https://n.news.naver.com/mnews/article/003/0013391031?sid=101",
             "https://imgnews.pstatic.net/image/003/2025/07/29/NISI20250729_0020908209_web_20250729134833_20250729134922533.jpg?type=w860",
             LocalDateTime.now().minusDays(2),
-            LocalDateTime.now().minusDays(1),
+            LocalDateTime.now().minusDays(1).minusSeconds(10),
             "뉴시스",
             "류현주 기자",
             "https://www.newsis.com/view/NISI20250729_0020908209",
