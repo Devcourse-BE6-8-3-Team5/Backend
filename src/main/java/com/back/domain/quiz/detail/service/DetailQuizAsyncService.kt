@@ -11,7 +11,6 @@ class DetailQuizAsyncService(
     private val detailQuizService: DetailQuizService,
     private val detailQuizRateLimitedService: DetailQuizRateLimitedService
 ) {
-    private val inProgressMap = ConcurrentHashMap<Long, Boolean>()
     private val inProgress = ConcurrentHashMap.newKeySet<Long>()
 
     @Async("quizExecutor")
