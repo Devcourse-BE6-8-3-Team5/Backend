@@ -1,4 +1,4 @@
-package com.back.backend.domain.member.controller
+package com.back.domain.member.controller
 
 import com.back.domain.member.member.entity.Member
 import com.back.domain.member.member.repository.MemberRepository
@@ -41,9 +41,9 @@ class MemberControllerTest @Autowired constructor(
     @DisplayName("회원가입 성공")
     fun join_success() {
         mvc.perform(post("/api/members/join")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(
-                    """
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(
+                """
                     {
                         "name": "테스트유저",
                         "password": "12345678910",
@@ -51,7 +51,7 @@ class MemberControllerTest @Autowired constructor(
                     }
                 
                 """.trimIndent()
-                )
+            )
         )
             .andDo(print())
             .andExpect(status().isCreated())
@@ -65,9 +65,9 @@ class MemberControllerTest @Autowired constructor(
     fun login_success() {
         // 회원가입
         mvc.perform(post("/api/members/join")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(
-                    """
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(
+                """
                     {
                         "name": "테스트유저",
                         "password": "12345678910",
@@ -75,21 +75,21 @@ class MemberControllerTest @Autowired constructor(
                     }
                 
                 """.trimIndent()
-                )
+            )
         )
 
         // 로그인
         val loginResult = mvc.perform(post("/api/members/login")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(
-                    """
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(
+                """
                     {
                         "email": "test2@example.com",
                         "password": "12345678910"
                     }
                 
                 """.trimIndent()
-                )
+            )
         ).andDo(print())
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.code").value(200))
@@ -109,9 +109,9 @@ class MemberControllerTest @Autowired constructor(
     fun myInfo_with_accessToken() {
         // 회원가입 및 로그인
         mvc.perform(post("/api/members/join")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(
-                    """
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(
+                """
                     {
                         "name": "테스트유저",
                         "password": "12345678910",
@@ -119,26 +119,26 @@ class MemberControllerTest @Autowired constructor(
                     }
                 
                 """.trimIndent()
-                )
+            )
         )
         val loginResult = mvc.perform(post("/api/members/login")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(
-                    """
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(
+                """
                     {
                         "email": "test3@example.com",
                         "password": "12345678910"
                     }
                 
                 """.trimIndent()
-                )
+            )
         )
         val response = loginResult.andReturn().response
         val accessToken = response.getCookie("accessToken")?.value
 
         // accessToken으로 마이페이지 접근
         mvc.perform(get("/api/members/info")
-                .cookie(Cookie("accessToken", accessToken))
+            .cookie(Cookie("accessToken", accessToken))
         )
             .andDo(print())
             .andExpect(status().isOk())
@@ -150,9 +150,9 @@ class MemberControllerTest @Autowired constructor(
     fun accessToken_expired_then_reissue_with_apiKey() {
         // 회원가입 및 로그인
         mvc.perform(post("/api/members/join")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(
-                    """
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(
+                """
                     {
                         "name": "테스트유저",
                         "password": "12345678910",
@@ -160,19 +160,19 @@ class MemberControllerTest @Autowired constructor(
                     }
                 
                 """.trimIndent()
-                )
+            )
         )
         val loginResult = mvc.perform(post("/api/members/login")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(
-                    """
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(
+                """
                     {
                         "email": "test4@example.com",
                         "password": "12345678910"
                     }
                 
                 """.trimIndent()
-                )
+            )
         )
         val response = loginResult.andReturn().response
         val apiKey = response.getCookie("apiKey")?.getValue()
@@ -182,8 +182,8 @@ class MemberControllerTest @Autowired constructor(
 
         // 만료된 accessToken + 유효한 apiKey로 마이페이지 접근 시 accessToken 재발급
         mvc.perform(get("/api/members/info")
-                .cookie(Cookie("accessToken", expiredToken))
-                .cookie(Cookie("apiKey", apiKey))
+            .cookie(Cookie("accessToken", expiredToken))
+            .cookie(Cookie("apiKey", apiKey))
         )
             .andDo(print())
             .andExpect(status().isOk())
@@ -195,9 +195,9 @@ class MemberControllerTest @Autowired constructor(
     fun logout_only_cookie_deleted() {
         // 회원가입 및 로그인
         mvc.perform(post("/api/members/join")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(
-                    """
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(
+                """
                     {
                         "name": "테스트유저",
                         "password": "12345678910",
@@ -205,19 +205,19 @@ class MemberControllerTest @Autowired constructor(
                     }
                 
                 """.trimIndent()
-                )
+            )
         )
         val loginResult = mvc.perform(post("/api/members/login")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(
-                    """
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(
+                """
                     {
                         "email": "test5@example.com",
                         "password": "12345678910"
                     }
                 
                 """.trimIndent()
-                )
+            )
         )
         val response = loginResult.andReturn().response
         val apiKey = response.getCookie("apiKey")?.value
@@ -225,8 +225,8 @@ class MemberControllerTest @Autowired constructor(
 
         // 로그아웃
         mvc.perform(delete("/api/members/logout")
-                .cookie(Cookie("accessToken", accessToken))
-                .cookie(Cookie("apiKey", apiKey))
+            .cookie(Cookie("accessToken", accessToken))
+            .cookie(Cookie("apiKey", apiKey))
         )
             .andDo(print())
             .andExpect(status().isOk())
@@ -321,9 +321,9 @@ class MemberControllerTest @Autowired constructor(
     fun join_fail_duplicate_email() {
         // 첫 번째 회원가입
         mvc.perform(post("/api/members/join")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(
-                    """
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(
+                """
                 {
                     "name": "테스트유저",
                     "password": "12345678910",
@@ -331,14 +331,14 @@ class MemberControllerTest @Autowired constructor(
                 }
             
             """.trimIndent()
-                )
+            )
         )
 
         // 두 번째 회원가입(같은 이메일)
         mvc.perform(post("/api/members/join")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(
-                    """
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(
+                """
                 {
                     "name": "다른유저",
                     "password": "12345678910",
@@ -346,7 +346,7 @@ class MemberControllerTest @Autowired constructor(
                 }
             
             """.trimIndent()
-                )
+            )
         )
             .andDo(print())
             .andExpect(status().isConflict())
@@ -357,9 +357,9 @@ class MemberControllerTest @Autowired constructor(
     @DisplayName("회원가입 실패 - 유효하지 않은 이메일 형식")
     fun join_fail_invalid_email() {
         mvc.perform(post("/api/members/join")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(
-                    """
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(
+                """
                 {
                     "name": "테스트유저",
                     "password": "12345678910",
@@ -367,7 +367,7 @@ class MemberControllerTest @Autowired constructor(
                 }
             
             """.trimIndent()
-                )
+            )
         )
             .andDo(print())
             .andExpect(status().isBadRequest())
@@ -378,9 +378,9 @@ class MemberControllerTest @Autowired constructor(
     fun myInfo_with_only_accessToken() {
         // 회원가입 및 로그인
         mvc.perform(post("/api/members/join")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(
-                    """
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(
+                """
                 {
                     "name": "테스트유저",
                     "password": "12345678910",
@@ -388,25 +388,25 @@ class MemberControllerTest @Autowired constructor(
                 }
             
             """.trimIndent()
-                )
+            )
         )
         val loginResult = mvc.perform(post("/api/members/login")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(
-                    """
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(
+                """
                 {
                     "email": "test8@example.com",
                     "password": "12345678910"
                 }
             
             """.trimIndent()
-                )
+            )
         )
         val accessToken = loginResult.andReturn().response.getCookie("accessToken")?.value
 
         // accessToken만으로 마이페이지 접근
         mvc.perform(get("/api/members/info")
-                .cookie(Cookie("accessToken", accessToken))
+            .cookie(Cookie("accessToken", accessToken))
         )
             .andDo(print())
             .andExpect(status().isOk())
@@ -448,7 +448,7 @@ class MemberControllerTest @Autowired constructor(
 
         // apiKey만으로 마이페이지 접근
         mvc.perform(get("/api/members/info")
-                .cookie(Cookie("apiKey", apiKey))
+            .cookie(Cookie("apiKey", apiKey))
         )
             .andDo(print())
             .andExpect(status().isOk())
@@ -460,9 +460,9 @@ class MemberControllerTest @Autowired constructor(
     fun logout_then_relogin() {
         // 회원가입 및 로그인
         mvc!!.perform(post("/api/members/join")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(
-                    """
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(
+                """
                 {
                     "name": "테스트유저",
                     "password": "12345678910",
@@ -470,19 +470,19 @@ class MemberControllerTest @Autowired constructor(
                 }
             
             """.trimIndent()
-                )
+            )
         )
         val loginResult = mvc.perform(post("/api/members/login")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(
-                    """
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(
+                """
                 {
                     "email": "test10@example.com",
                     "password": "12345678910"
                 }
             
             """.trimIndent()
-                )
+            )
         )
         val response = loginResult.andReturn().response
         val apiKey = response.getCookie("apiKey")?.value
@@ -490,23 +490,23 @@ class MemberControllerTest @Autowired constructor(
 
         // 로그아웃
         mvc.perform(delete("/api/members/logout")
-                .cookie(Cookie("accessToken", accessToken))
-                .cookie(Cookie("apiKey", apiKey))
+            .cookie(Cookie("accessToken", accessToken))
+            .cookie(Cookie("apiKey", apiKey))
         )
             .andExpect(status().isOk())
 
         // 재로그인
         mvc.perform(post("/api/members/login")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(
-                    """
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(
+                """
                 {
                     "email": "test10@example.com",
                     "password": "12345678910"
                 }
             
             """.trimIndent()
-                )
+            )
         )
             .andDo(print())
             .andExpect(status().isOk())
@@ -519,9 +519,9 @@ class MemberControllerTest @Autowired constructor(
     fun user_access_myInfo_success() {
         // 일반 유저 회원가입 및 로그인
         mvc.perform(post("/api/members/join")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(
-                    """
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(
+                """
                 {
                     "name": "일반유저",
                     "password": "12345678910",
@@ -529,27 +529,27 @@ class MemberControllerTest @Autowired constructor(
                 }
             
             """.trimIndent()
-                )
+            )
         )
 
         val loginResult = mvc.perform(post("/api/members/login")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(
-                    """
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(
+                """
                 {
                     "email": "user@example.com",
                     "password": "12345678910"
                 }
             
             """.trimIndent()
-                )
+            )
         )
 
         val accessToken = loginResult.andReturn().response.getCookie("accessToken")?.value
 
         // 일반 유저가 마이페이지 접근 (성공해야 함)
         mvc.perform(get("/api/members/info")
-                .cookie(Cookie("accessToken", accessToken))
+            .cookie(Cookie("accessToken", accessToken))
         )
             .andDo(print())
             .andExpect(status().isOk())
@@ -576,16 +576,16 @@ class MemberControllerTest @Autowired constructor(
         )
 
         val loginResult = mvc.perform(post("/api/members/login")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(
-                    """
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(
+                """
                 {
                     "email": "user2@example.com",
                     "password": "12345678910"
                 }
             
             """.trimIndent()
-                )
+            )
         )
 
         val accessToken = loginResult.andReturn().response.getCookie("accessToken")?.value
@@ -620,23 +620,23 @@ class MemberControllerTest @Autowired constructor(
 
         // 관리자 로그인
         val loginResult = mvc.perform(post("/api/members/login")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(
-                    """
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(
+                """
                 {
                     "email": "admin2@example.com",
                     "password": "12345678910"
                 }
             
             """.trimIndent()
-                )
+            )
         )
 
         val accessToken = loginResult.andReturn().response.getCookie("accessToken")?.value
 
         // 관리자가 마이페이지 접근 (성공해야 함)
         mvc.perform(get("/api/members/info")
-                .cookie(Cookie("accessToken", accessToken))
+            .cookie(Cookie("accessToken", accessToken))
         )
             .andDo(print())
             .andExpect(status().isOk())
@@ -657,9 +657,9 @@ class MemberControllerTest @Autowired constructor(
     fun user_access_admin_api_forbidden() {
         // 일반 유저 회원가입 및 로그인
         mvc.perform(post("/api/members/join")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(
-                    """
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(
+                """
                 {
                     "name": "일반유저3",
                     "password": "12345678910",
@@ -667,27 +667,27 @@ class MemberControllerTest @Autowired constructor(
                 }
             
             """.trimIndent()
-                )
+            )
         )
 
         val loginResult = mvc.perform(post("/api/members/login")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(
-                    """
+            .contentType(MediaType.APPLICATION_JSON)
+            .content(
+                """
                 {
                     "email": "user3@example.com",
                     "password": "12345678910"
                 }
             
             """.trimIndent()
-                )
+            )
         )
 
         val accessToken = loginResult.andReturn().response.getCookie("accessToken")?.value
 
         // 일반 유저가 관리자 전용 API 접근 (403 에러)
         mvc.perform(delete("/api/admin/members")
-                .cookie(Cookie("accessToken", accessToken))
+            .cookie(Cookie("accessToken", accessToken))
         )
             .andDo(print())
             .andExpect(status().isForbidden())
