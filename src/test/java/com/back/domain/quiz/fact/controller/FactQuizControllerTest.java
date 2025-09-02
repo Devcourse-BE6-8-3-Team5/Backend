@@ -1,7 +1,7 @@
-package com.back.backend.domain.quiz.fact.controller;
+package com.back.domain.quiz.fact.controller;
 
-import com.back.backend.global.config.TestRqConfig;
-import com.back.backend.global.rq.TestRq;
+import com.back.global.config.TestRqConfig;
+import com.back.global.rq.TestRq;
 import com.back.domain.member.member.entity.Member;
 import com.back.domain.member.member.service.MemberService;
 import com.back.global.rq.Rq;

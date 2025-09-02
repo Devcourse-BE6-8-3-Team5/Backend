@@ -1,4 +1,4 @@
-package com.back.backend.domain.quiz.detail.eventListener;
+package com.back.domain.quiz.detail.eventListener;
 
 import com.back.domain.news.real.entity.RealNews;
 import com.back.domain.news.real.event.RealNewsCreatedEvent;

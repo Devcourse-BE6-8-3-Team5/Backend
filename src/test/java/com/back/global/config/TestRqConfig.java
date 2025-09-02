@@ -1,6 +1,6 @@
-package com.back.backend.global.config;
+package com.back.global.config;
 
-import com.back.backend.global.rq.TestRq;
+import com.back.global.rq.TestRq;
 import com.back.global.rq.Rq;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;

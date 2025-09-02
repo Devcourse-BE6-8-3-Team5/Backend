@@ -1,7 +1,7 @@
 package com.back.domain.news.real.controller
 
-import com.back.backend.global.config.TestRqConfig
-import com.back.backend.global.rq.TestRq
+import com.back.global.config.TestRqConfig
+import com.back.global.rq.TestRq
 import com.back.domain.member.member.entity.Member
 import com.back.domain.news.common.enums.NewsCategory
 import com.back.domain.news.real.entity.RealNews

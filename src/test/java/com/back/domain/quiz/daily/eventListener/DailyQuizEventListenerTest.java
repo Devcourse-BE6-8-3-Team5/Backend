@@ -1,4 +1,4 @@
-package com.back.backend.domain.quiz.daily.eventListener;
+package com.back.domain.quiz.daily.eventListener;
 
 import com.back.domain.news.today.event.TodayNewsCreatedEvent;
 import com.back.domain.news.today.repository.TodayNewsRepository;

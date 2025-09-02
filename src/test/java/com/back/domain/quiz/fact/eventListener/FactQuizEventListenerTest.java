@@ -1,4 +1,4 @@
-package com.back.backend.domain.quiz.fact.eventListener;
+package com.back.domain.quiz.fact.eventListener;
 
 import com.back.domain.news.common.enums.NewsCategory;
 import com.back.domain.news.fake.entity.FakeNews;
@@ -203,7 +203,6 @@ public class FactQuizEventListenerTest {
 
     private FakeNews createFakeNews(RealNews realNews, String content) {
         return new FakeNews(
-                    realNews.getId(),
                     realNews,
                     content
                 );

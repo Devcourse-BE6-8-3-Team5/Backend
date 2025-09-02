@@ -1,9 +1,8 @@
-package com.back.backend.global.ai;
+package com.back.global.ai;
 
 import com.back.domain.quiz.detail.dto.DetailQuizCreateReqDto;
 import com.back.domain.quiz.detail.dto.DetailQuizDto;
 import com.back.domain.quiz.detail.entity.Option;
-import com.back.global.ai.AiService;
 import com.back.global.ai.processor.DetailQuizProcessor;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.module.kotlin.KotlinModule;

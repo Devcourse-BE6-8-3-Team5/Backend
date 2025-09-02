@@ -1,4 +1,4 @@
-package com.back.backend.global.rq;
+package com.back.global.rq;
 
 import com.back.domain.member.member.entity.Member;
 import com.back.domain.member.member.service.MemberService;
