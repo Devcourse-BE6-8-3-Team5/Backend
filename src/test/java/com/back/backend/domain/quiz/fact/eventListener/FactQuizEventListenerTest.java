@@ -202,10 +202,11 @@ public class FactQuizEventListenerTest {
     }
 
     private FakeNews createFakeNews(RealNews realNews, String content) {
-        return FakeNews.builder()
-                .realNews(realNews)
-                .content(content)
-                .build();
+        return new FakeNews(
+                    realNews.getId(),
+                    realNews,
+                    content
+                );
     }
 
     private void verifySpecificQuiz(List<FactQuiz> quizzes, Long realNewsId, String expectedRealContent, String expectedFakeContent) {

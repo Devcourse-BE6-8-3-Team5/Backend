@@ -1,12 +1,11 @@
 package com.back.domain.news.real.service
 
-import com.back.domain.news.common.dto.AnalyzedNewsDto
-import com.back.domain.news.common.dto.NaverNewsDto
 import com.back.domain.news.common.service.KeepAliveMonitoringService
 import com.back.domain.news.common.service.KeywordGenerationService
 import com.back.domain.news.real.dto.RealNewsDto
 import com.back.domain.news.real.event.RealNewsCreatedEvent
 import com.back.domain.news.today.service.TodayNewsService
+import com.back.standard.extensions.executeWithKeepAlive
 import org.slf4j.LoggerFactory
 import org.springframework.context.ApplicationEventPublisher
 import org.springframework.scheduling.annotation.Scheduled
@@ -27,27 +26,42 @@ class AdminNewsService(
 
     companion object {
         private val log = LoggerFactory.getLogger(AdminNewsService::class.java)
-        private val STATIC_KEYWORD = listOf("속보", "긴급", "단독")
+        private val STATIC_KEYWORDS = listOf("속보", "긴급", "단독")
     }
 
-    @Scheduled(cron = "0 0 0 * * *", zone = "Asia/Seoul") // 매일 자정에 실행
+    @Scheduled(cron = "0 0 0 * * *", zone = "Asia/Seoul")
     @Transactional
     fun dailyNewsProcess() {
-        keepAliveMonitoringService.startBatchKeepAlive()
+        keepAliveMonitoringService.executeWithKeepAlive {
+            executeNewsProcessingPipeline()
+        }
+    }
 
-        runCatching {
-            val keywords: List<String> = keywordGenerationService.generateTodaysKeywords().keywords
-            val newsKeywordsAfterAdd: MutableList<String> = newsDataService.addKeywords(keywords, STATIC_KEYWORD)
-            val newsMetaData: List<NaverNewsDto> = newsDataService.collectMetaDataFromNaver(newsKeywordsAfterAdd)
-            val newsAfterCrwal: List<RealNewsDto> = newsDataService.createRealNewsDtoByCrawl(newsMetaData)
-            val newsAfterFilter: List<AnalyzedNewsDto> = newsAnalysisService.filterAndScoreNews(newsAfterCrwal)
-            val selectedNews: List<RealNewsDto> = newsDataService.selectNewsByScore(newsAfterFilter)
-            val savedNews: List<RealNewsDto> = newsDataService.saveAllRealNews(selectedNews)
+    private fun executeNewsProcessingPipeline() {
+        newsProcessingPipeline()
+            .fold(
+                onSuccess = { savedNews -> handleProcessingSuccess(savedNews) },
+                onFailure = { e -> log.error("뉴스 처리 중 오류 발생", e) }
+            )
+    }
 
-            savedNews.firstOrNull()?.let { firstNews -> todayNewsService.setTodayNews(firstNews.id)
-                publishNewsCreatedEvent(savedNews.map{ it.id })
-                } ?: log.warn("저장된 뉴스가 없습니다. 오늘의 뉴스 수집이 실패했을 수 있습니다.")
-        }.onFailure { e -> log.error("뉴스 처리 중 오류 발생",e) }
+    private fun newsProcessingPipeline(): Result<List<RealNewsDto>> = runCatching {
+        keywordGenerationService.generateTodaysKeywords().keywords
+            .let { generated -> newsDataService.addKeywords(generated, STATIC_KEYWORDS) }
+            .let { keywords -> newsDataService.collectMetaDataFromNaver(keywords) }
+            .let { metadata -> newsDataService.createRealNewsDtoByCrawl(metadata) }
+            .let { crawledNews -> newsAnalysisService.filterAndScoreNews(crawledNews) }
+            .let { analyzedNews -> newsDataService.selectNewsByScore(analyzedNews) }
+            .let { selectedNews -> newsDataService.saveAllRealNews(selectedNews) }
+    }
+
+    private fun handleProcessingSuccess(savedNews: List<RealNewsDto>) {
+        savedNews
+            .takeIf { it.isNotEmpty() }
+            ?.also { news -> todayNewsService.setTodayNews(news.first().id) }
+            ?.map { it.id }
+            ?.let { ids -> publishNewsCreatedEvent(ids) }
+            ?: log.warn("저장된 뉴스가 없습니다. 오늘의 뉴스 수집이 실패했을 수 있습니다.")
     }
 
     private fun publishNewsCreatedEvent(newsIds: List<Long>) {
