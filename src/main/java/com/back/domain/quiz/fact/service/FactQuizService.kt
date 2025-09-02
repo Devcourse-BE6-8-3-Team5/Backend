@@ -50,8 +50,8 @@ class FactQuizService(
     @Transactional(readOnly = true)
     fun findByCategory(category: NewsCategory, rank: Int): List<FactQuizDto> =
         findByCategoryAndRank(category, rank)
-            .map { listOf(it) }
-            .orElse(emptyList())
+            .map(::listOf)
+            .orElseGet(::emptyList)
 
     @Transactional(readOnly = true)
     fun findByCategoryAndRank(category: NewsCategory, rank: Int): Optional<FactQuizDto> {
@@ -59,7 +59,7 @@ class FactQuizService(
             ?: return Optional.empty()
 
         return factQuizRepository.findByRealNewsId(realNews.id)
-            .map { quiz: FactQuiz? -> FactQuizDto(quiz!!) }
+            .map(::FactQuizDto)
     }
 
     @Transactional(readOnly = true)
