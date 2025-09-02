@@ -28,7 +28,7 @@ class DevTestController(
             devTestNewsService.testNewsDataService()
         }.fold(
             onSuccess = { testNews -> of(200, "테스트 뉴스 생성 완료", testNews) },
-            onFailure = { e -> of<List<RealNewsDto>>(500, "테스트 뉴스 생성 실패: ${e.message}", emptyList()) }
+            onFailure = { e -> of(500, "테스트 뉴스 생성 실패: ${e.message}", emptyList()) }
         )
     }
 

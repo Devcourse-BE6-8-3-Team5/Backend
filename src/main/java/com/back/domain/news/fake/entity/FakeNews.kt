@@ -8,9 +8,7 @@ import jakarta.persistence.*
 @Entity
 @Table(
     name = "fake_news",
-    indexes = [
-        Index(name = "idx_fake_news_real_news_id", columnList = "real_news_id")
-    ]
+    indexes = [Index(name = "idx_fake_news_real_news_id", columnList = "real_news_id")]
 )
 class FakeNews(
     @field:OneToOne(fetch = FetchType.LAZY)
