@@ -2,6 +2,7 @@ package com.back.domain.news.real.service
 
 import com.back.domain.news.common.dto.AnalyzedNewsDto
 import com.back.domain.news.real.dto.RealNewsDto
+import jakarta.annotation.PostConstruct
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.core.task.TaskRejectedException
@@ -11,21 +12,24 @@ import java.util.Collections.synchronizedList
 import java.util.concurrent.CompletableFuture.allOf
 
 @Service
-class NewsAnalysisService(private val newsAnalysisBatchService: NewsAnalysisBatchService) {
-
+class NewsAnalysisService(
+    private val newsAnalysisBatchService: NewsAnalysisBatchService,
+    @Value("\${news.filter.batch.size:2}") private val batchSize: Int
+) {
     companion object {
         private val log = LoggerFactory.getLogger(NewsAnalysisService::class.java)
     }
 
-    @Value("\${news.filter.batch.size:2}")
-    private val batchSize = 0
+    @PostConstruct
+    fun validateConfig() {
+        require(batchSize in 1..3) { "batchSize를 1에서 3사이로 설정하세요" }
+    }
 
     fun filterAndScoreNews(allRealNewsBeforeFilter: List<RealNewsDto>?): List<AnalyzedNewsDto> {
         if (allRealNewsBeforeFilter.isNullOrEmpty()) {
             log.warn("필터링할 뉴스가 없습니다.")
             return emptyList()
         }
-
         log.info("뉴스 필터링 시작 - 총 ${allRealNewsBeforeFilter.size}개")
 
         val batches = allRealNewsBeforeFilter.chunked(batchSize)
@@ -38,7 +42,6 @@ class NewsAnalysisService(private val newsAnalysisBatchService: NewsAnalysisBatc
                 .exceptionally { throwable -> log.error("배치 처리 실패", throwable)
                     if (isTaskRejectionException(throwable))
                         log.error("스레드풀 용량 부족 - 스레드 크기 확인 필요")
-
                     null
                 }
         }

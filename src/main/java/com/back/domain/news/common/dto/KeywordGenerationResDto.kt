@@ -1,18 +1,21 @@
 package com.back.domain.news.common.dto
 
-import com.fasterxml.jackson.annotation.JsonProperty
-
 
 data class KeywordGenerationResDto(
-    @JsonProperty("society") val society: List<KeywordWithType> = emptyList(),
-    @JsonProperty("economy") val economy: List<KeywordWithType> = emptyList(),
-    @JsonProperty("politics") val politics: List<KeywordWithType> = emptyList(),
-    @JsonProperty("culture") val culture: List<KeywordWithType> = emptyList(),
-    @JsonProperty("it") val it: List<KeywordWithType> = emptyList()
+    val society: List<KeywordWithType> = emptyList(),
+    val economy: List<KeywordWithType> = emptyList(),
+    val politics: List<KeywordWithType> = emptyList(),
+    val culture: List<KeywordWithType> = emptyList(),
+    val it: List<KeywordWithType> = emptyList()
 ) {
 
+    // 모든 키워드를 String 리스트로 반환
     val keywords: List<String>
-        get() = listOf(society, economy, politics, culture, it)
+        get() = getAllKeywordLists()
             .flatten()
             .map { it.keyword }
+
+    // 모든 KeywordWithType 리스트들을 반환 (내부 재사용)
+    private fun getAllKeywordLists(): List<List<KeywordWithType>> =
+        listOf(society, economy, politics, culture, it)
 }
