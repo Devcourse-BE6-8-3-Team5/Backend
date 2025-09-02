@@ -118,16 +118,13 @@ class FakeNewsService(
             return
         }
 
-        val (existingIds, newDtos) = fakeNewsDtos
-            .distinctBy { it.realNewsId }
-            .partition { dto ->                     //findExistingIds활용하여 n+1 쿼리 문제 해결
-                dto.realNewsId in fakeNewsRepository.findExistingIds(fakeNewsDtos.map { it.realNewsId }).toSet()
-            }
+        val uniqueDtos = fakeNewsDtos.distinctBy { it.realNewsId }
+        val existingIds = fakeNewsRepository.findExistingIds(uniqueDtos.map { it.realNewsId }).toSet()
+        val newDtos = uniqueDtos.filterNot { it.realNewsId in existingIds }
 
-        log.debug("처리 현황 - 신규: {}개, 기존: {}개", newDtos.size, existingIds.size)
+        log.debug("처리 현황 - 신규: {}개, 기존: {}개", newDtos.size, uniqueDtos.size - newDtos.size)
 
-        val result = newDtos
-            .takeIf { it.isNotEmpty() }
+        newDtos.takeIf { it.isNotEmpty() }
             ?.runCatching {
                 map { dto ->
                     FakeNews(
@@ -135,22 +132,20 @@ class FakeNewsService(
                         content = dto.content
                     )
                 }.let { fakeNewsRepository.saveAll(it) }
-            }
-
-        result?.fold(
-            onSuccess = { saved ->
-                log.info("=== 배치 저장 완료 - 성공: {}개, 스킵: {}개 ===",
-                    saved.count(), existingIds.size)
-            },
-            onFailure = { e ->
-                log.error("배치 저장 실패", e)
-                throw e
-            }
-        ) ?: log.info("저장할 신규 FakeNews가 없습니다.")
+            }?.fold(
+                onSuccess = { saved ->
+                    log.info("=== 배치 저장 완료 - 성공: {}개, 스킵: {}개 ===",
+                        saved.count(), uniqueDtos.size - newDtos.size)
+                },
+                onFailure = { e ->
+                    log.error("배치 저장 실패", e)
+                    throw e
+                }
+            ) ?: log.info("저장할 신규 FakeNews가 없습니다.")
     }
 
     fun count(): Int {
-        return fakeNewsRepository!!.count().toInt()
+        return fakeNewsRepository.count().toInt()
     }
 }
 
