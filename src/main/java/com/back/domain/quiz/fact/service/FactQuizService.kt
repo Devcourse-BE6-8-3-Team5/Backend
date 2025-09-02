@@ -2,7 +2,6 @@ package com.back.domain.quiz.fact.service
 
 import com.back.domain.member.member.entity.Member
 import com.back.domain.member.member.repository.MemberRepository
-import com.back.domain.member.quizhistory.entity.QuizHistory
 import com.back.domain.member.quizhistory.repository.QuizHistoryRepository
 import com.back.domain.member.quizhistory.service.QuizHistoryService
 import com.back.domain.news.common.enums.NewsCategory
@@ -72,8 +71,6 @@ class FactQuizService(
 
         val factQuizDto = FactQuizDtoWithNewsContent(factQuiz)
 
-        val histories: List<QuizHistory?> = quizHistoryRepository!!.findByMember(actor)
-
         // 필터링: 퀴즈 ID가 일치하고, 퀴즈 타입이 FACT인 히스토리만 추출
         val quizHistory = quizHistoryRepository.findByMember(actor)
             .firstOrNull { it.quizId == id && it.quizType == QuizType.FACT }
@@ -92,7 +89,7 @@ class FactQuizService(
     }
 
     @Transactional
-    fun create(realNewsIds: List<Long?>) {
+    fun create(realNewsIds: List<Long>) {
         val realNewsList = realNewsRepository.findAllById(realNewsIds)
 
         if (realNewsList.isEmpty()) {

@@ -56,7 +56,7 @@ class FactQuizController(
             content = [Content(
                 mediaType = "application/json",
                 schema = Schema(implementation = RsData::class),
-                examples = [ExampleObject(value = """{"resultCode":404,"msg":"팩트 퀴즈를 찾을 수 없습니다. ID: 1","data":null}""")]
+                examples = [ExampleObject(value = """{"code":404,"msg":"팩트 퀴즈를 찾을 수 없습니다. ID: 1","data":null}""")]
             )]
         )
     )
@@ -75,7 +75,7 @@ class FactQuizController(
             content = [Content(
                 mediaType = "application/json",
                 schema = Schema(implementation = RsData::class),
-                examples = [ExampleObject(value = """{"resultCode":404,"msg":"팩트 퀴즈를 찾을 수 없습니다. ID: 1","data":null}""")]
+                examples = [ExampleObject(value = """{"code":404,"msg":"팩트 퀴즈를 찾을 수 없습니다. ID: 1","data":null}""")]
             )]
         )
     )
