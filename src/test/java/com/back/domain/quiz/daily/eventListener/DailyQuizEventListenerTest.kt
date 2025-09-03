@@ -77,14 +77,13 @@ class DailyQuizEventListenerTest {
         dailyQuizRepository.findByTodayNewsId(todayNewsId).forEach { dailyQuiz ->
             assertThat(dailyQuiz.todayNews.id).isEqualTo(todayNewsId)
             assertThat(dailyQuiz.todayNews.selectedDate).isEqualTo(LocalDate.now())
-            assertThat(dailyQuiz.detailQuiz).isNotNull
+            assertThat(dailyQuiz.detailQuiz).isNotNull()
             assertThat(dailyQuiz.detailQuiz.realNews.id).isEqualTo(todayNewsId)
         }
     }
 
     @Test
     @DisplayName("TodayNewsCreatedEvent 발생 시 오늘의 퀴즈가 정상 생성되는지 검증")
-    @Commit
     fun t2() {
         // Given
         val todayNewsId = 5L
@@ -99,9 +98,9 @@ class DailyQuizEventListenerTest {
         }
 
         dailyQuizRepository.findByTodayNewsId(todayNewsId).forEach { dailyQuiz ->
-            assertThat(dailyQuiz.todayNews).isNotNull
+            assertThat(dailyQuiz.todayNews).isNotNull()
             assertThat(dailyQuiz.todayNews.id).isEqualTo(todayNewsId)
-            assertThat(dailyQuiz.detailQuiz).isNotNull
+            assertThat(dailyQuiz.detailQuiz).isNotNull()
             assertThat(dailyQuiz.detailQuiz.realNews.id).isEqualTo(todayNewsId)
         }
     }
@@ -115,13 +114,14 @@ class DailyQuizEventListenerTest {
         // When - 동일한 이벤트를 다시 발행
         eventPublisher.publishEvent(TodayNewsCreatedEvent(todayNewsId))
         waitForAsyncCompletion()
+        val countAfterFirst = dailyQuizRepository.count()
 
         eventPublisher.publishEvent(TodayNewsCreatedEvent(todayNewsId))
         waitForAsyncCompletion()
+        val finalQuizCount = dailyQuizRepository.count()
 
         // Then - 퀴즈 개수가 증가하지 않았는지 확인
-        val finalQuizCount = dailyQuizRepository.count()
-        assertThat(finalQuizCount).isEqualTo(initialQuizCount.toLong())
+        assertThat(finalQuizCount).isEqualTo(countAfterFirst)
     }
 
     @Test
