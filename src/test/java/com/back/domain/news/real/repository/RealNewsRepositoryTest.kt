@@ -11,16 +11,13 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager
 import org.springframework.data.domain.PageRequest
-import org.springframework.test.context.TestConstructor
 import java.time.LocalDateTime
 
 @DataJpaTest
-@TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
-class RealNewsRepositoryTest(
-    @Autowired private val testEntityManager: TestEntityManager,
-    @Autowired private val realNewsRepository: RealNewsRepository
-) {
-
+class RealNewsRepositoryTest
+{
+    @Autowired private lateinit var testEntityManager: TestEntityManager
+    @Autowired private lateinit var realNewsRepository: RealNewsRepository
     private lateinit var testData: List<RealNews>
 
     @BeforeEach

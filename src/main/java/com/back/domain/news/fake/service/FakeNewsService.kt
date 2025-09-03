@@ -12,7 +12,6 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Qualifier
-import org.springframework.scheduling.annotation.Async
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Propagation
 import org.springframework.transaction.annotation.Transactional
@@ -34,7 +33,6 @@ class FakeNewsService(
         private val log: Logger = LoggerFactory.getLogger(FakeNewsService::class.java)
     }
 
-    @Async("newsExecutor")
     fun generateFakeNewsBatch(realNewsDtos: List<RealNewsDto>): CompletableFuture<List<FakeNewsDto>> {
         if (realNewsDtos.isEmpty()) {
             log.warn("생성할 가짜뉴스가 없습니다.")
@@ -125,6 +123,7 @@ class FakeNewsService(
         log.debug("처리 현황 - 신규: {}개, 기존: {}개", newDtos.size, uniqueDtos.size - newDtos.size)
 
         newDtos.takeIf { it.isNotEmpty() }
+
             ?.runCatching {
                 map { dto ->
                     FakeNews(
@@ -146,6 +145,7 @@ class FakeNewsService(
 
     fun count(): Int {
         return fakeNewsRepository.count().toInt()
+
     }
 }
 
