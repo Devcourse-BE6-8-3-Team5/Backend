@@ -179,9 +179,9 @@ class RealNewsRepositoryTest
     fun findQByTitleExcludingNthCategoryRank() {
         // given
         val searchTitle = "뉴스"
-        val excludedId = testData.first().id
         val excludedRank = 1 // 첫 번째
         val pageable = PageRequest.of(0, 10)
+        val category = NewsCategory.entries.first()
 
         // 실제 DB에서 해당 카테고리의 뉴스들을 조회하여 테스트 데이터로 사용
         val categoryNews = realNewsRepository.findAllByNewsCategoryOrderByCreatedDateDesc(category, PageRequest.of(0, 10))

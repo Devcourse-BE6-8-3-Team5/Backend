@@ -59,10 +59,8 @@ dependencies {
     implementation("org.springframework.ai:spring-ai-starter-model-openai:1.0.0")
     implementation("com.bucket4j:bucket4j_jdk17-core:8.14.0")
 
-    compileOnly("org.projectlombok:lombok")
     developmentOnly("org.springframework.boot:spring-boot-devtools")
     runtimeOnly("com.mysql:mysql-connector-j")
-    annotationProcessor("org.projectlombok:lombok")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
     testImplementation("org.springframework.security:spring-security-test")
@@ -95,8 +93,12 @@ kapt {
 
 sourceSets {
     main {
+        kotlin.srcDirs("src/main/kotlin")
         java {
-            srcDir("$buildDir/generated/source/kapt/main")
+            srcDir("${layout.buildDirectory.get()}/generated/source/kapt/main")
         }
+    }
+    test {
+        kotlin.srcDirs("src/test/kotlin")
     }
 }

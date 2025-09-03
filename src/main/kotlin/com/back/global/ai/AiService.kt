@@ -1,12 +1,10 @@
 package com.back.global.ai
 
 import com.back.global.ai.processor.AiRequestProcessor
-import lombok.RequiredArgsConstructor
 import org.springframework.ai.chat.client.ChatClient
 import org.springframework.stereotype.Service
 
 @Service
-@RequiredArgsConstructor
 class AiService(
     private val chatClient: ChatClient,
 ) {
