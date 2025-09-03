@@ -22,7 +22,7 @@ class RealNewsRepositoryImpl(
         excludedRank: Int,
         pageable: Pageable
     ): Page<RealNews> {
-        // 1. 카테고리별 N번째 뉴스들의 ID를 먼저 조회
+        // 1. 카테고리별 N번째 뉴스들의 ID를 먼저 조회 (excludedId는 제외하고)
         val excludedIds = NewsCategory.entries.mapNotNull { category ->
             jpaQueryFactory
                 .select(qRealNews.id)
