@@ -55,7 +55,7 @@ class AdminNewsControllerTest {
     @BeforeEach
     fun setUp() {
         val admin = Member(1, "admin@123", "admin", "ADMIN")
-        (rq as TestRq).setActor(admin)
+        (rq as TestRq).actor = admin
 
         savedNews1 = realNewsRepository.save(
             RealNews(

@@ -47,7 +47,7 @@ class DailyQuizControllerTest {
         val testUser = memberService.join("testUser", "12341234", "test@test.com")
 
         // 테스트 Rq에 사용자 지정
-        (rq as TestRq).setActor(testUser)
+        (rq as TestRq).actor = testUser
     }
 
     @Test
