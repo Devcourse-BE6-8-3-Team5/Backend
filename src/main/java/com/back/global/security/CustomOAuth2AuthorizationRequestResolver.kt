@@ -21,16 +21,27 @@ class CustomOAuth2AuthorizationRequestResolver(
         OAuth2AuthorizationRequestRedirectFilter.DEFAULT_AUTHORIZATION_REQUEST_BASE_URI
     )
 
-    override fun resolve(request: HttpServletRequest): OAuth2AuthorizationRequest? =
-        delegate.resolve(request)?.let { customizeState(it, request) }
+    override fun resolve(request: HttpServletRequest): OAuth2AuthorizationRequest? {
+        val req = delegate.resolve(request) ?: return null
+        return customizeRequest(req, request)
+    }
 
-    override fun resolve(request: HttpServletRequest, clientRegistrationId: String?): OAuth2AuthorizationRequest? =
-        delegate.resolve(request, clientRegistrationId)?.let { customizeState(it, request) }
+    override fun resolve(request: HttpServletRequest, clientRegistrationId: String?): OAuth2AuthorizationRequest? {
+        val req = delegate.resolve(request, clientRegistrationId) ?: return null
+        return customizeRequest(req, request)
+    }
 
-    private fun customizeState(
-        req: OAuth2AuthorizationRequest,
-        request: HttpServletRequest
-    ): OAuth2AuthorizationRequest {
+    private fun customizeRequest(req: OAuth2AuthorizationRequest, request: HttpServletRequest): OAuth2AuthorizationRequest {
+        // 개발 환경에서 redirect_uri를 프론트엔드 주소로 변경
+        val authorizationRequest = if (request.serverName == "localhost") {
+            val newRedirectUri = req.redirectUri?.replace("localhost:8080", "localhost:3000")
+            OAuth2AuthorizationRequest.from(req)
+                .redirectUri(newRedirectUri)
+                .build()
+        } else {
+            req
+        }
+
         // 요청 파라미터에서 redirectUrl 가져오기, 없으면 "/"
         val redirectUrl = request.getParameter("redirectUrl").orEmpty().ifBlank { "/" }
 
@@ -43,7 +54,7 @@ class CustomOAuth2AuthorizationRequestResolver(
         // Base64 URL-safe 인코딩
         val encodedState = Base64.getUrlEncoder().encodeToString(rawState.toByteArray(StandardCharsets.UTF_8))
 
-        return OAuth2AuthorizationRequest.from(req)
+        return OAuth2AuthorizationRequest.from(authorizationRequest)
             .state(encodedState) // state 교체
             .build()
     }
