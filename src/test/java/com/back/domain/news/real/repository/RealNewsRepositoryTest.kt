@@ -95,6 +95,7 @@ class RealNewsRepositoryTest
         }
     }
 
+
     @Test
     @DisplayName("전체 뉴스 조회하되 각 카테고리의 N번째 뉴스와 특정 ID 제외")
     fun findQAllExcludingNth() {
@@ -112,6 +113,7 @@ class RealNewsRepositoryTest
 
         // excludedId는 결과에 포함되지 않아야 함
         assertThat(result.content.map { it.id }).doesNotContain(excludedId)
+
 
         // 각 카테고리의 1번째 뉴스들도 제외되었는지 확인
         NewsCategory.entries.forEach { category ->
@@ -181,6 +183,14 @@ class RealNewsRepositoryTest
         val excludedRank = 1 // 첫 번째
         val pageable = PageRequest.of(0, 10)
 
+        // 실제 DB에서 해당 카테고리의 뉴스들을 조회하여 테스트 데이터로 사용
+        val categoryNews = realNewsRepository.findAllByNewsCategoryOrderByCreatedDateDesc(category, PageRequest.of(0, 10))
+
+        // 충분한 데이터가 있는지 확인
+        assumeTrue(categoryNews.content.size >= 3) { "테스트를 위한 충분한 데이터가 없습니다." }
+
+        val excludedId = categoryNews.content.first().id // 실제 DB의 첫 번째 뉴스 ID
+
         // when
         val result = realNewsRepository.findQByTitleExcludingNthCategoryRank(
             searchTitle, excludedId, excludedRank, pageable
@@ -209,7 +219,12 @@ class RealNewsRepositoryTest
         // 생성일 내림차순으로 정렬되어야 함
         val dates = result.content.map { it.createdDate }
         assertThat(dates).isSortedAccordingTo(Comparator.reverseOrder())
+
+        // 페이징 검증
+        assertThat(result.totalElements).isGreaterThan(0)
+        assertThat(result.content.size).isLessThanOrEqualTo(pageable.pageSize)
     }
+
 
     @Test
     @DisplayName("모든 카테고리에서 N번째 뉴스들 조회")
