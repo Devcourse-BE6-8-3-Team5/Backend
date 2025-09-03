@@ -94,6 +94,7 @@ class DevTestNewsService(
             val cleanDescription = HtmlEntityDecoder.decode(rawDescription)
 
             // 모든 필드가 비어있지 않은 경우만 DTO 생성
+
             if (listOf(cleanedTitle, originallink, link, cleanDescription, pubDate).all { it?.isNotBlank() ?: true }) {
                 NaverNewsDto(cleanedTitle, originallink, link, cleanDescription, pubDate)
             } else null
