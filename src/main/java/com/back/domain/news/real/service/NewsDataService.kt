@@ -11,8 +11,6 @@ import com.back.domain.news.real.repository.RealNewsRepository
 import com.back.domain.news.today.repository.TodayNewsRepository
 import com.back.global.util.HtmlEntityDecoder
 import org.slf4j.LoggerFactory
-import org.springframework.data.domain.Page
-import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
@@ -140,10 +138,6 @@ class NewsDataService(
             .toList()
     }
 
-    @Transactional(readOnly = true)
-    fun getAllRealNewsList(pageable: Pageable): Page<RealNewsDto> {
-        return realNewsRepository.findAllByOrderByCreatedDateDesc(pageable)
-            .map{ realNews: RealNews -> realNewsMapper.toDto(realNews) }
-    }
+
 
 }

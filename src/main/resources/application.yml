@@ -89,5 +89,7 @@ news:
         threshold: 0.2 # 중복 뉴스 제목 유사도 기준
     description:
         threshold: 0.15 # 중복 뉴스 내용 유사도 기준
+  exclude:
+    index: 1
 healthchecks:
   url: ${HEALTHCHECK_URL}
