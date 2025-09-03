@@ -12,18 +12,14 @@ interface RealNewsRepository : JpaRepository<RealNews, Long>, RealNewsRepository
     // 기본 전체 조회 (인덱스: idx_real_news_created_date_desc 직접 활용)
     fun findAllByOrderByCreatedDateDesc(pageable: Pageable): Page<RealNews>
 
-    fun findByNewsCategoryAndIdNotOrderByCreatedDateDesc(
-        category: NewsCategory,
-        excludedId: Long,
-        pageable: Pageable
-    ): Page<RealNews>
+    fun findByNewsCategoryAndIdNotOrderByCreatedDateDesc(category: NewsCategory, excludedId: Long, pageable: Pageable): Page<RealNews>
 
-    fun findByTitleContainingAndIdNotOrderByCreatedDateDesc(
-        title: String,
-        excludedId: Long,
-        pageable: Pageable
-    ): Page<RealNews>
+    fun findByTitleContainingAndIdNotOrderByCreatedDateDesc(title: String, excludedId: Long, pageable: Pageable): Page<RealNews>
 
     fun findByCreatedDateBetweenOrderByCreatedDateDesc(start: LocalDateTime, end: LocalDateTime): List<RealNews>
+
+    fun findAllByNewsCategoryOrderByCreatedDateDesc(category: NewsCategory, pageable: Pageable): Page<RealNews>
+
+    fun countByNewsCategory(category: NewsCategory): Long
 
 }
