@@ -75,8 +75,8 @@ class NaverNewsService(
             val rawNews = getNewsMetaDataFromNaverApi(items)
             val naverOnly = rawNews.filter { it.link.contains("n.news.naver.com") }
 
-            val dedupTitle = newsDeduplicationService.removeDuplicateByBitSetByField(naverOnly, { it.title }, titleSimilarityThreshold)
-            val dedupDescription = newsDeduplicationService.removeDuplicateByBitSetByField(dedupTitle, { it.description }, descriptionSimilarityThreshold)
+            val dedupTitle = newsDeduplicationService.removeDuplicateByBitSetByField(naverOnly, { it.title.toString() }, titleSimilarityThreshold)
+            val dedupDescription = newsDeduplicationService.removeDuplicateByBitSetByField(dedupTitle, { it.description.toString() }, descriptionSimilarityThreshold)
             val limited = dedupDescription.take(12)
 
             log.info("키워드 '${keyword}': 원본 ${naverOnly.size}개 → 중복제거 후 ${dedupDescription.size}개 → 제한 후 ${limited.size}개")
@@ -109,7 +109,7 @@ class NaverNewsService(
             val cleanDescription = HtmlEntityDecoder.decode(rawDescription)
 
             // 모든 필드가 비어있지 않은 경우만 DTO 생성
-            if (listOf(cleanedTitle, originallink, link, cleanDescription, pubDate).all { it.isNotBlank() }) {
+            if (listOf(cleanedTitle, originallink, link, cleanDescription, pubDate).all { it?.isNotBlank() == true }) {
                 NaverNewsDto(cleanedTitle, originallink, link, cleanDescription, pubDate)
             } else null
         }

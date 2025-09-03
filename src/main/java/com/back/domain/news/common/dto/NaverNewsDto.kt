@@ -2,10 +2,10 @@ package com.back.domain.news.common.dto
 
 
 data class NaverNewsDto(
-    val title: String, 
+    val title: String?,
     val originallink: String,
     val link: String,
-    val description: String,
+    val description: String?,
     val pubDate: String
 ) {
     constructor(dto: NaverNewsDto): this(

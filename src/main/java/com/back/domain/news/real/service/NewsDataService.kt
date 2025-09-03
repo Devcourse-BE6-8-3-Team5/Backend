@@ -11,6 +11,7 @@ import com.back.domain.news.real.repository.RealNewsRepository
 import com.back.domain.news.today.repository.TodayNewsRepository
 import com.back.global.util.HtmlEntityDecoder
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
@@ -28,6 +29,7 @@ class NewsDataService(
     private val realNewsRepository: RealNewsRepository,
     private val todayNewsRepository: TodayNewsRepository,
     private val realNewsMapper: RealNewsMapper,
+    @Value("\${naver.crawling.delay}") private val crawlingDelay: Int
 ) {
 
     companion object {
@@ -36,16 +38,32 @@ class NewsDataService(
 
     @Transactional
     fun createRealNewsDtoByCrawl(metaDataList: List<NaverNewsDto>): List<RealNewsDto> {
+        val allRealNewsDtos = mutableListOf<RealNewsDto>()
+
         return runCatching {
-            metaDataList.mapNotNull { metaData ->
-                newsCrawlingService.crawladditionalInfo(metaData.link)?.let { newsDetailData ->
-                    makeRealNewsFromInfo(metaData, newsDetailData).also {
-                        log.info("새 뉴스 생성: ${it.title}")
-                    }}}
+            for (metaData in metaDataList) {
+                val newsDetailData = newsCrawlingService.crawladditionalInfo(metaData.link)
+
+                if (newsDetailData == null) {
+                    log.warn("크롤링 실패: {}", metaData.link)
+                    continue
+                }
+
+                val realNewsDto = makeRealNewsFromInfo(metaData, newsDetailData)
+                log.info("새 뉴스 생성 - 제목: {}", realNewsDto.title)
+                allRealNewsDtos.add(realNewsDto)
+
+                // 크롤링 간격 조절 (서버 부하 방지)
+                Thread.sleep(crawlingDelay.toLong())
+            }
+            allRealNewsDtos.toList()
         }.onFailure { e ->
-            if (e is InterruptedException) {
-                Thread.currentThread().interrupt()
-                log.error("크롤링 중 인터럽트 발생", e)
+            when (e) {
+                is InterruptedException -> {
+                    Thread.currentThread().interrupt() // 인터럽트 상태 복원
+                    log.error("크롤링 중 인터럽트 발생", e)
+                }
+                else -> log.error("크롤링 중 예외 발생", e)
             }
         }.getOrElse { emptyList() }
     }
@@ -62,17 +80,18 @@ class NewsDataService(
     // 네이버 API를 통해 메타데이터 수집
     fun collectMetaDataFromNaver(keywords: List<String>): List<NaverNewsDto> {
         log.info("네이버 API 호출 시작: {} 개 키워드", keywords.size)
-        val futures = keywords.map { keyword -> naverNewsService.fetchNews(keyword)}
+        val futures = keywords.map(naverNewsService::fetchNews)
 
         return runCatching {
             CompletableFuture.allOf(*futures.toTypedArray()).get()
-            futures.flatMap { future -> (future.get() as List<NaverNewsDto>)
-                .filter { dto -> dto.link.contains("n.news.naver.com") }
+            futures.flatMap { future ->
+                future.get().filter { dto -> dto.link.contains("n.news.naver.com") }
             }
         }.onFailure { e ->
             when (e) {
                 is InterruptedException -> log.error("뉴스 조회가 인터럽트됨", e)
                 is ExecutionException -> log.error("뉴스 조회 중 오류 발생", e.cause)
+                else -> log.error("예상치 못한 오류 발생", e)
             }
         }.getOrElse { emptyList() }
     }
@@ -82,9 +101,9 @@ class NewsDataService(
     fun makeRealNewsFromInfo(naverNewsDto: NaverNewsDto, newsDetailDto: NewsDetailDto): RealNewsDto {
         return RealNewsDto(
             0L,
-            naverNewsDto.title,
+            naverNewsDto.title ?: "",
             newsDetailDto.content,
-            naverNewsDto.description,
+            naverNewsDto.description ?: "",
             naverNewsDto.link,
             newsDetailDto.imgUrl,
             parseNaverDate(naverNewsDto.pubDate),
@@ -112,13 +131,13 @@ class NewsDataService(
 
     @Transactional
     fun deleteRealNews(newsId: Long): Boolean {
-        return realNewsRepository.findById(newsId).map { realNews ->
+        return realNewsRepository.findById(newsId).orElse(null)?.let { realNews ->
             if (todayNewsRepository.existsById(newsId))
                 todayNewsRepository.deleteById(newsId)
 
             realNewsRepository.deleteById(newsId)
             true
-        }.orElse(false)
+        } ?: false
     }
 
 
