@@ -11,8 +11,6 @@ import com.back.domain.news.real.repository.RealNewsRepository
 import com.back.domain.news.today.repository.TodayNewsRepository
 import com.back.global.util.HtmlEntityDecoder
 import org.slf4j.LoggerFactory
-import org.springframework.data.domain.Page
-import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
@@ -62,7 +60,7 @@ class NewsDataService(
     }
 
     // 네이버 API를 통해 메타데이터 수집
-    fun collectMetaDataFromNaver(keywords: MutableList<String>): List<NaverNewsDto> {
+    fun collectMetaDataFromNaver(keywords: List<String>): List<NaverNewsDto> {
         log.info("네이버 API 호출 시작: {} 개 키워드", keywords.size)
         val futures = keywords.map { keyword -> naverNewsService.fetchNews(keyword)}
 
@@ -140,10 +138,6 @@ class NewsDataService(
             .toList()
     }
 
-    @Transactional(readOnly = true)
-    fun getAllRealNewsList(pageable: Pageable): Page<RealNewsDto> {
-        return realNewsRepository.findAllByOrderByCreatedDateDesc(pageable)
-            .map{ realNews: RealNews -> realNewsMapper.toDto(realNews) }
-    }
+
 
 }

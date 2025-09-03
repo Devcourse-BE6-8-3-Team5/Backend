@@ -46,7 +46,7 @@ data class RealNews(
 ) { // 상세 퀴즈와 1:N 관계 설정 (RealNews 하나 당 3개의 DetailQuiz가 생성됩니다.)
     @field:OneToMany(mappedBy = "realNews", cascade = [CascadeType.ALL], orphanRemoval = true)
     @get:JsonIgnore
-    val detailQuizzes: List<DetailQuiz> = mutableListOf()
+    val detailQuizzes: MutableList<DetailQuiz> = mutableListOf()
 
     @field:OneToMany(mappedBy = "realNews", cascade = [CascadeType.ALL], orphanRemoval = true)
     @get:JsonIgnore

@@ -2,6 +2,7 @@ package com.back.domain.news.real.service
 
 import com.back.domain.news.common.enums.NewsCategory
 import com.back.domain.news.real.dto.RealNewsDto
+import com.back.domain.news.real.entity.RealNews
 import com.back.domain.news.real.mapper.RealNewsMapper
 import com.back.domain.news.real.repository.RealNewsRepository
 import com.back.domain.news.today.repository.TodayNewsRepository
@@ -76,6 +77,12 @@ class RealNewsService(
 
         return realNewsRepository.findQByCategoryExcludingNth(category, excludedId, n + 1, unsortedPageable)
             .map { realNews -> realNewsMapper.toDto(realNews) }
+    }
+
+    @Transactional(readOnly = true)
+    fun getAllRealNewsList(pageable: Pageable): Page<RealNewsDto> {
+        return realNewsRepository.findAllByOrderByCreatedDateDesc(pageable)
+            .map{ realNews: RealNews -> realNewsMapper.toDto(realNews) }
     }
 
     @get:Transactional(readOnly = true)
