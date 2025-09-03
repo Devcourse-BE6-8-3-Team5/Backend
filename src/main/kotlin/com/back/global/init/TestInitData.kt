@@ -12,7 +12,6 @@ import com.back.domain.quiz.detail.dto.DetailQuizDto
 import com.back.domain.quiz.detail.entity.Option
 import com.back.domain.quiz.detail.service.DetailQuizService
 import com.back.domain.quiz.fact.service.FactQuizService
-import lombok.RequiredArgsConstructor
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.ApplicationRunner
 import org.springframework.context.annotation.Bean
@@ -26,7 +25,6 @@ import java.util.List
 
 @Configuration
 @Profile("test")
-@RequiredArgsConstructor
 class TestInitData(
     private val memberService: MemberService,
     private val newsDataService: NewsDataService,
