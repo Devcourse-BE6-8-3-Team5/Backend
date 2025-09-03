@@ -16,7 +16,7 @@ class NewsDeduplicationService {
         metaDataList: List<NaverNewsDto>,
         fieldExtractor: (NaverNewsDto) -> String,
         similarityThreshold: Double
-    ): MutableList<NaverNewsDto> {
+    ): List<NaverNewsDto> {
         // 전체 키워드에 인덱스 부여 (존재하는 키워드에 대해 인덱스 부여)
         val keywordIndexMap = mutableMapOf<String, Int>()
         var idx = 0
