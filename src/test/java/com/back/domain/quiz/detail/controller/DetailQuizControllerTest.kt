@@ -150,9 +150,6 @@ class DetailQuizControllerTest {
 
     @Test
     @DisplayName("GET /api/quiz/detail/news/{newsId} - 뉴스 ID로 상세 퀴즈 목록 조회 실패 - 뉴스에 퀴즈가 없는 경우")
-    @Throws(
-        Exception::class
-    )
     fun t6() {
         //Given
         val newsId = 8L
@@ -173,9 +170,6 @@ class DetailQuizControllerTest {
     @Test
     @DisplayName("POST /api/quiz/detail/news/{newsId}/regenerate - 뉴스 ID로 상세 퀴즈 생성")
     @Disabled("실제 AI 호출 테스트 - 필요할 때만 실행")
-    @Throws(
-        Exception::class
-    )
     fun t7() {
         // Given
         val newsId = 1L
@@ -197,9 +191,6 @@ class DetailQuizControllerTest {
 
     @Test
     @DisplayName("PUT /api/quiz/detail/{id} - 상세 퀴즈 수정")
-    @Throws(
-        Exception::class
-    )
     fun t8() {
         //Given
         val quizId = 1L
@@ -224,9 +215,6 @@ class DetailQuizControllerTest {
 
     @Test
     @DisplayName("POST /api/quiz/detail/submit/{id} - 퀴즈 정답 제출")
-    @Throws(
-        Exception::class
-    )
     fun t9() {
         // Given
         val quizId = 1L
@@ -254,9 +242,6 @@ class DetailQuizControllerTest {
 
     @Test
     @DisplayName("POST /api/quiz/detail/submit/{id} - 퀴즈 오답 제출")
-    @Throws(
-        Exception::class
-    )
     fun t10() {
         // Given
         val quizId = 1L
