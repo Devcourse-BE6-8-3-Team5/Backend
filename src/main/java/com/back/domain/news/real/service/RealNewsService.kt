@@ -88,6 +88,6 @@ class RealNewsService(
     @get:Transactional(readOnly = true)
     val todayNewsOrRecent: Long
         get() = todayNewsRepository.findTopByOrderBySelectedDateDesc()
-            .map { it.realNews.id }
-            .orElse(-1L)
+            ?.realNews?.id ?: -1L
+
 }
