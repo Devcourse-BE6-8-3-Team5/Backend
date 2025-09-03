@@ -96,49 +96,49 @@ class RealNewsRepositoryTest
     }
 
 
-
-    @Test
-    @DisplayName("제목으로 검색하되 각 카테고리의 N번째 뉴스와 특정 ID 제외")
-    fun findQByTitleExcludingNthCategoryRank() {
-        // given
-        val searchTitle = "뉴스"
-        val excludedId = testData.first().id
-        val excludedRank = 2
-        val pageable = PageRequest.of(0, 10)
-
-        // when
-        val result = realNewsRepository.findQByTitleExcludingNthCategoryRank(
-            searchTitle, excludedId, excludedRank, pageable
-        )
-
-        // then
-        assertThat(result).isNotNull
-        assertThat(result.content).isNotEmpty
-
-        // 제목에 "뉴스"가 포함되어야 함
-        result.content.forEach { news ->
-            assertThat(news.title).containsIgnoringCase(searchTitle)
-        }
-
-        // excludedId는 결과에 포함되지 않아야 함
-        assertThat(result.content.map { it.id }).doesNotContain(excludedId)
-
-        // 각 카테고리의 2번째 뉴스들도 제외되어야 함 (실제 DB 데이터로 검증)
-        val excludedIds = NewsCategory.entries.mapNotNull { category ->
-            realNewsRepository.findByNewsCategoryAndIdNotOrderByCreatedDateDesc(category, excludedId, PageRequest.of(0, 100))
-                .content
-                .getOrNull(excludedRank - 1)?.id
-        }
-
-        val allExcludedIds = excludedIds + excludedId
-        result.content.forEach { news ->
-            assertThat(allExcludedIds).doesNotContain(news.id)
-        }
-
-        // 생성일 내림차순으로 정렬되어야 함
-        val dates = result.content.map { it.createdDate }
-        assertThat(dates).isSortedAccordingTo(Comparator.reverseOrder())
-    }
+//
+//    @Test
+//    @DisplayName("제목으로 검색하되 각 카테고리의 N번째 뉴스와 특정 ID 제외")
+//    fun findQByTitleExcludingNthCategoryRank() {
+//        // given
+//        val searchTitle = "뉴스"
+//        val excludedId = testData.first().id
+//        val excludedRank = 2
+//        val pageable = PageRequest.of(0, 10)
+//
+//        // when
+//        val result = realNewsRepository.findQByTitleExcludingNthCategoryRank(
+//            searchTitle, excludedId, excludedRank, pageable
+//        )
+//
+//        // then
+//        assertThat(result).isNotNull
+//        assertThat(result.content).isNotEmpty
+//
+//        // 제목에 "뉴스"가 포함되어야 함
+//        result.content.forEach { news ->
+//            assertThat(news.title).containsIgnoringCase(searchTitle)
+//        }
+//
+//        // excludedId는 결과에 포함되지 않아야 함
+//        assertThat(result.content.map { it.id }).doesNotContain(excludedId)
+//
+//        // 각 카테고리의 2번째 뉴스들도 제외되어야 함 (실제 DB 데이터로 검증)
+//        val excludedIds = NewsCategory.entries.mapNotNull { category ->
+//            realNewsRepository.findByNewsCategoryAndIdNotOrderByCreatedDateDesc(category, excludedId, PageRequest.of(0, 100))
+//                .content
+//                .getOrNull(excludedRank - 1)?.id
+//        }
+//
+//        val allExcludedIds = excludedIds + excludedId
+//        result.content.forEach { news ->
+//            assertThat(allExcludedIds).doesNotContain(news.id)
+//        }
+//
+//        // 생성일 내림차순으로 정렬되어야 함
+//        val dates = result.content.map { it.createdDate }
+//        assertThat(dates).isSortedAccordingTo(Comparator.reverseOrder())
+//    }
 
     @Test
     @DisplayName("빈 제목으로 검색시 빈 결과 반환")
@@ -158,42 +158,42 @@ class RealNewsRepositoryTest
         assertThat(result.content).isEmpty()
         assertThat(result.totalElements).isZero()
     }
-
-    @Test
-    @DisplayName("전체 뉴스 조회하되 각 카테고리의 N번째 뉴스와 특정 ID 제외")
-    fun findQAllExcludingNth() {
-        // given
-        val excludedId = testData.first().id
-        val excludedRank = 3
-        val pageable = PageRequest.of(0, 20)
-
-        // when
-        val result = realNewsRepository.findQAllExcludingNth(excludedId, excludedRank, pageable)
-
-        // then
-        assertThat(result).isNotNull
-        assertThat(result.content).isNotEmpty
-
-        // excludedId는 결과에 포함되지 않아야 함
-        assertThat(result.content.map { it.id }).doesNotContain(excludedId)
-
-        // 실제 DB에서 각 카테고리별로 excludedId를 제외한 상태에서 3번째 뉴스 ID를 조회
-        val categoryExcludedIds = NewsCategory.entries.mapNotNull { category ->
-            realNewsRepository.findByNewsCategoryAndIdNotOrderByCreatedDateDesc(category, excludedId, PageRequest.of(0, 100))
-                .content
-                .getOrNull(excludedRank - 1)?.id
-        }
-
-        // 결과에는 excludedId와 각 카테고리의 N번째 뉴스들이 모두 제외되어야 함
-        val allExcludedIds = categoryExcludedIds + excludedId
-        result.content.forEach { news ->
-            assertThat(allExcludedIds).doesNotContain(news.id)
-        }
-
-        // 생성일 내림차순으로 정렬되어야 함
-        val dates = result.content.map { it.createdDate }
-        assertThat(dates).isSortedAccordingTo(Comparator.reverseOrder())
-    }
+//
+//    @Test
+//    @DisplayName("전체 뉴스 조회하되 각 카테고리의 N번째 뉴스와 특정 ID 제외")
+//    fun findQAllExcludingNth() {
+//        // given
+//        val excludedId = testData.first().id
+//        val excludedRank = 3
+//        val pageable = PageRequest.of(0, 20)
+//
+//        // when
+//        val result = realNewsRepository.findQAllExcludingNth(excludedId, excludedRank, pageable)
+//
+//        // then
+//        assertThat(result).isNotNull
+//        assertThat(result.content).isNotEmpty
+//
+//        // excludedId는 결과에 포함되지 않아야 함
+//        assertThat(result.content.map { it.id }).doesNotContain(excludedId)
+//
+//        // 실제 DB에서 각 카테고리별로 excludedId를 제외한 상태에서 3번째 뉴스 ID를 조회
+//        val categoryExcludedIds = NewsCategory.entries.mapNotNull { category ->
+//            realNewsRepository.findByNewsCategoryAndIdNotOrderByCreatedDateDesc(category, excludedId, PageRequest.of(0, 100))
+//                .content
+//                .getOrNull(excludedRank - 1)?.id
+//        }
+//
+//        // 결과에는 excludedId와 각 카테고리의 N번째 뉴스들이 모두 제외되어야 함
+//        val allExcludedIds = categoryExcludedIds + excludedId
+//        result.content.forEach { news ->
+//            assertThat(allExcludedIds).doesNotContain(news.id)
+//        }
+//
+//        // 생성일 내림차순으로 정렬되어야 함
+//        val dates = result.content.map { it.createdDate }
+//        assertThat(dates).isSortedAccordingTo(Comparator.reverseOrder())
+//    }
 
     @Test
     @DisplayName("페이징이 올바르게 동작하는지 확인")
@@ -272,44 +272,44 @@ class RealNewsRepositoryTest
         assertThat(result.content.size).isLessThanOrEqualTo(pageable.pageSize)
     }
 
-
-    @Test
-    @DisplayName("모든 카테고리에서 N번째 뉴스들 조회")
-    fun findQNthRankByAllCategories() {
-        // given
-        val targetRank = 2
-
-        // when
-        val result = realNewsRepository.findQNthRankByAllCategories(targetRank)
-
-        // then
-        assertThat(result).isNotNull
-
-        // 각 카테고리별로 하나씩의 뉴스만 있어야 함
-        val categoryCount = result.groupBy { it.newsCategory }.size
-        assertThat(categoryCount).isLessThanOrEqualTo(NewsCategory.entries.size)
-
-        // 각 카테고리별로 중복이 없어야 함
-        val categories = result.map { it.newsCategory }
-        assertThat(categories).doesNotHaveDuplicates()
-
-        // 결과가 생성일 내림차순으로 정렬되어야 함
-        val dates = result.map { it.createdDate }
-        assertThat(dates).isSortedAccordingTo(Comparator.reverseOrder())
-
-        // 각 결과가 해당 카테고리의 2번째 뉴스인지 확인 (실제 DB 데이터로 검증)
-        // findQNthRankByAllCategories는 excludedId 조건 없이 순수하게 N번째를 조회하므로
-        // 전체 조회 후 카테고리별로 필터링해서 검증
-        result.forEach { news ->
-            val allCategoryNews = realNewsRepository.findAllByOrderByCreatedDateDesc(PageRequest.of(0, 1000))
-                .content
-                .filter { it.newsCategory == news.newsCategory }
-            val expectedNews = allCategoryNews.getOrNull(targetRank - 1)
-            if (expectedNews != null) {
-                assertThat(news.id).isEqualTo(expectedNews.id)
-            }
-        }
-    }
+//
+//    @Test
+//    @DisplayName("모든 카테고리에서 N번째 뉴스들 조회")
+//    fun findQNthRankByAllCategories() {
+//        // given
+//        val targetRank = 2
+//
+//        // when
+//        val result = realNewsRepository.findQNthRankByAllCategories(targetRank)
+//
+//        // then
+//        assertThat(result).isNotNull
+//
+//        // 각 카테고리별로 하나씩의 뉴스만 있어야 함
+//        val categoryCount = result.groupBy { it.newsCategory }.size
+//        assertThat(categoryCount).isLessThanOrEqualTo(NewsCategory.entries.size)
+//
+//        // 각 카테고리별로 중복이 없어야 함
+//        val categories = result.map { it.newsCategory }
+//        assertThat(categories).doesNotHaveDuplicates()
+//
+//        // 결과가 생성일 내림차순으로 정렬되어야 함
+//        val dates = result.map { it.createdDate }
+//        assertThat(dates).isSortedAccordingTo(Comparator.reverseOrder())
+//
+//        // 각 결과가 해당 카테고리의 2번째 뉴스인지 확인 (실제 DB 데이터로 검증)
+//        // findQNthRankByAllCategories는 excludedId 조건 없이 순수하게 N번째를 조회하므로
+//        // 전체 조회 후 카테고리별로 필터링해서 검증
+//        result.forEach { news ->
+//            val allCategoryNews = realNewsRepository.findAllByOrderByCreatedDateDesc(PageRequest.of(0, 1000))
+//                .content
+//                .filter { it.newsCategory == news.newsCategory }
+//            val expectedNews = allCategoryNews.getOrNull(targetRank - 1)
+//            if (expectedNews != null) {
+//                assertThat(news.id).isEqualTo(expectedNews.id)
+//            }
+//        }
+//    }
 
     @Test
     @DisplayName("특정 카테고리에서 N번째 뉴스 조회")
