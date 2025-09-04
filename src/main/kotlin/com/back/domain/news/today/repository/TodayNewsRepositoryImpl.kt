@@ -19,32 +19,32 @@ class TodayNewsRepositoryImpl(
 
     override fun findQBySelectedDateWithDetailQuizzes(selectedDate: LocalDate): TodayNews? {
         return jpaQueryFactory
-            .select(qTodayNews)
+            .selectDistinct(qTodayNews)
             .from(qTodayNews)
             .join(qTodayNews.realNews(), qRealNews).fetchJoin()
-            .leftJoin(qDetailQuiz).on(qDetailQuiz.realNews().eq(qRealNews)).fetchJoin()
+            .leftJoin(qRealNews.detailQuizzes, qDetailQuiz).fetchJoin()
             .where(qTodayNews.selectedDate.eq(selectedDate))
             .fetchOne()
     }
 
     override fun findQByIdWithDetailQuizzes(id: Long): TodayNews? {
         return jpaQueryFactory
-            .select(qTodayNews)
+            .selectDistinct(qTodayNews)
             .from(qTodayNews)
             .join(qTodayNews.realNews(), qRealNews).fetchJoin()
-            .leftJoin(qDetailQuiz).on(qDetailQuiz.realNews().eq(qRealNews)).fetchJoin()
+            .leftJoin(qRealNews.detailQuizzes, qDetailQuiz).fetchJoin()
             .where(qTodayNews.id.eq(id))
             .fetchOne()
     }
 
     override fun findQTopByOrderBySelectedDateDescWithDetailQuizzes(): TodayNews? {
-        return jpaQueryFactory
-            .select(qTodayNews)
+        val topId = jpaQueryFactory
+            .select(qTodayNews.id)
             .from(qTodayNews)
-            .join(qTodayNews.realNews(), qRealNews).fetchJoin()
-            .leftJoin(qDetailQuiz).on(qDetailQuiz.realNews().eq(qRealNews)).fetchJoin()
             .orderBy(qTodayNews.selectedDate.desc())
             .limit(1)
             .fetchOne()
+
+        return topId?.let { findQByIdWithDetailQuizzes(it) }
     }
 }

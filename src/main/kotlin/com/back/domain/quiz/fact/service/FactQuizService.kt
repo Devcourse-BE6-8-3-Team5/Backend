@@ -96,14 +96,15 @@ class FactQuizService(
             throw ServiceException(404, "팩트 퀴즈를 생성할 진짜 뉴스가 존재하지 않습니다. ID 목록: $realNewsIds")
         }
 
-        val quizzes = realNewsList.mapNotNull { news ->
-            val newsWithFakeNews = realNewsRepository.findQByIdWithFakeNews(news.id)
-            val fakeNews = newsWithFakeNews?.fakeNews
-            if (fakeNews == null) {
-                log.warn("가짜 뉴스가 존재하지 않습니다. 진짜 뉴스 ID: ${news.id}")
-                null
-            } else createQuiz(newsWithFakeNews, fakeNews)
-        }
+        val realsWithFake = realNewsRepository.findQAllByIdsWithFakeNews(realNewsIds)
+
+        val quizzes = realsWithFake.mapNotNull { real ->
+                val fake = real.fakeNews ?: run {
+                        log.warn("가짜 뉴스가 존재하지 않습니다. 진짜 뉴스 ID: ${real.id}")
+                        null
+                    }
+                fake?.let { createQuiz(real, it) }
+            }
 
         /*
         val quizzes = realNewsList.mapNotNull { news ->

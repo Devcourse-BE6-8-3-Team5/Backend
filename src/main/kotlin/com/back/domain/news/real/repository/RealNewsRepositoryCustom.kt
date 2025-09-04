@@ -22,5 +22,6 @@ interface RealNewsRepositoryCustom {
     fun findQByIdWithFakeNews(id: Long): RealNews?
     
     fun findQByIdWithDetailQuizzes(id: Long): RealNews?
-
+    
+    fun findQAllByIdsWithFakeNews(ids: List<Long>): List<RealNews>
 }

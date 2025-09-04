@@ -18,12 +18,7 @@ class RealNewsRepositoryImpl(
 
     private val qRealNews = QRealNews.realNews
 
-    override fun findQByTitleExcludingNthCategoryRank(
-        title: String,
-        excludedId: Long,
-        excludedRank: Int,
-        pageable: Pageable
-    ): Page<RealNews> {
+    override fun findQByTitleExcludingNthCategoryRank(title: String, excludedId: Long, excludedRank: Int, pageable: Pageable): Page<RealNews> {
         // 1. 카테고리별 N번째 뉴스들의 ID를 먼저 조회 (excludedId는 제외하고)
         val excludedIds = NewsCategory.entries.mapNotNull { category ->
             jpaQueryFactory
@@ -186,13 +181,24 @@ class RealNewsRepositoryImpl(
 
     override fun findQByIdWithDetailQuizzes(id: Long): RealNews? {
         val qDetailQuiz = QDetailQuiz.detailQuiz
-        
+
         return jpaQueryFactory
-            .select(qRealNews)
-            .from(qRealNews)  
-            .leftJoin(qDetailQuiz).on(qDetailQuiz.realNews().eq(qRealNews)).fetchJoin()
+            .select(qRealNews).distinct()
+            .from(qRealNews)
+            .leftJoin(qRealNews.detailQuizzes, qDetailQuiz).fetchJoin()
             .where(qRealNews.id.eq(id))
             .fetchOne()
+    }
+
+
+    override fun findQAllByIdsWithFakeNews(ids: List<Long>): List<RealNews> {
+        if (ids.isEmpty()) return emptyList()
+        
+        return jpaQueryFactory
+            .selectFrom(qRealNews)
+            .leftJoin(QFakeNews.fakeNews).on(QFakeNews.fakeNews.id.eq(qRealNews.id)).fetchJoin()
+            .where(qRealNews.id.`in`(ids))
+            .fetch()
     }
 
 }
