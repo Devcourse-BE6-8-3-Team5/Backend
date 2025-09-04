@@ -97,11 +97,12 @@ class FactQuizService(
         }
 
         val quizzes = realNewsList.mapNotNull { news ->
-            val fakeNews = news.fakeNews
+            val newsWithFakeNews = realNewsRepository.findQByIdWithFakeNews(news.id)
+            val fakeNews = newsWithFakeNews?.fakeNews
             if (fakeNews == null) {
                 log.warn("가짜 뉴스가 존재하지 않습니다. 진짜 뉴스 ID: ${news.id}")
                 null
-            } else createQuiz(news, fakeNews)
+            } else createQuiz(newsWithFakeNews, fakeNews)
         }
 
         /*
@@ -138,10 +139,8 @@ class FactQuizService(
     // initData 전용
     @Transactional
     fun create(realNewsId: Long) {
-        val real = realNewsRepository.findById(realNewsId)
-            .orElseThrow {
-                ServiceException(404, "진짜 뉴스를 찾을 수 없습니다. ID: $realNewsId")
-            }
+        val real = realNewsRepository.findQByIdWithFakeNews(realNewsId)
+            ?: throw ServiceException(404, "진짜 뉴스를 찾을 수 없습니다. ID: $realNewsId")
 
         val fake = real.fakeNews ?: throw ServiceException(404, "가짜 뉴스가 없습니다. realNewsId=$realNewsId")
 

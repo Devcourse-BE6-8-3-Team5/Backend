@@ -35,7 +35,7 @@ class DevTestNewsService(
     fun testNewsDataService(): List<RealNewsDto> {
         val newsKeywordsAfterAdd = listOf("AI")
         val newsAfterRemoveDup = newsDataService.collectMetaDataFromNaver(newsKeywordsAfterAdd)
-        val newsAfterCrwal = newsDataService.createRealNewsDtoByCrawl(newsAfterRemoveDup)
+        val newsAfterCrwal = newsDataService.createRealNewsByWebCrawling(newsAfterRemoveDup)
         val newsAfterFilter = newsAnalysisService.filterAndScoreNews(newsAfterCrwal)
         val selectedNews = newsDataService.selectNewsByScore(newsAfterFilter)
         val savedNews = newsDataService.saveAllRealNews(selectedNews)

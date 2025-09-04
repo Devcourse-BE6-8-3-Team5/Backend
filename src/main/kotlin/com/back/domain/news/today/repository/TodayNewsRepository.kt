@@ -6,12 +6,8 @@ import org.springframework.data.jpa.repository.Modifying
 import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDate
 
-interface TodayNewsRepository : JpaRepository<TodayNews, Long> {
+interface TodayNewsRepository : JpaRepository<TodayNews, Long>, TodayNewsRepositoryCustom {
     @Modifying(clearAutomatically = true)
     @Transactional
     fun deleteBySelectedDate(today: LocalDate)
-
-    fun findBySelectedDate(today: LocalDate): TodayNews?
-
-    fun findTopByOrderBySelectedDateDesc(): TodayNews?
 }

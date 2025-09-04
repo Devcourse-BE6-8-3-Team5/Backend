@@ -15,11 +15,17 @@ class KeywordHistoryService(private val keywordHistoryRepository: KeywordHistory
 
     @Transactional
     fun saveKeywords(keywords: KeywordGenerationResDto, usedDate: LocalDate) {
-        saveKeywordsByCategory(keywords.society, NewsCategory.SOCIETY, usedDate)
-        saveKeywordsByCategory(keywords.economy, NewsCategory.ECONOMY, usedDate)
-        saveKeywordsByCategory(keywords.politics, NewsCategory.POLITICS, usedDate)
-        saveKeywordsByCategory(keywords.culture, NewsCategory.CULTURE, usedDate)
-        saveKeywordsByCategory(keywords.it, NewsCategory.IT, usedDate)
+        val categoryMappings = mapOf(
+            NewsCategory.SOCIETY to keywords.society,
+            NewsCategory.ECONOMY to keywords.economy,
+            NewsCategory.POLITICS to keywords.politics,
+            NewsCategory.CULTURE to keywords.culture,
+            NewsCategory.IT to keywords.it
+        )
+        
+        categoryMappings.forEach { (category, keywordList) ->
+            saveKeywordsByCategory(keywordList, category, usedDate)
+        }
     }
 
 

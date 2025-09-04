@@ -54,30 +54,38 @@ class RealNewsService(
 
     @Transactional(readOnly = true)
     fun getRealNewsListExcludingNth(pageable: Pageable, n: Int): Page<RealNewsDto> {
-        val excludedId = todayNewsOrRecent
-        val unsortedPageable = PageRequest.of(pageable.pageNumber, pageable.pageSize)
-
-        return realNewsRepository.findQAllExcludingNth(excludedId, n + 1, unsortedPageable)
-            .map { realNews -> realNewsMapper.toDto(realNews) }
+        return executeExcludingNthQuery(pageable, n) { excludedId, rank, unsortedPageable ->
+            realNewsRepository.findQAllExcludingNth(excludedId, rank, unsortedPageable)
+        }
     }
 
     @Transactional(readOnly = true)
     fun searchRealNewsByTitleExcludingNth(title: String, pageable: Pageable, n: Int): Page<RealNewsDto> {
-        val excludedId = todayNewsOrRecent
-        val unsortedPageable = PageRequest.of(pageable.pageNumber, pageable.pageSize)
-
-        return realNewsRepository.findQByTitleExcludingNthCategoryRank(title, excludedId, n + 1, unsortedPageable)
-            .map { realNews -> realNewsMapper.toDto(realNews) }
+        return executeExcludingNthQuery(pageable, n) { excludedId, rank, unsortedPageable ->
+            realNewsRepository.findQByTitleExcludingNthCategoryRank(title, excludedId, rank, unsortedPageable)
+        }
     }
 
     @Transactional(readOnly = true)
     fun getRealNewsListByCategoryExcludingNth(category: NewsCategory, pageable: Pageable, n: Int): Page<RealNewsDto> {
-        val excludedId = todayNewsOrRecent
-        val unsortedPageable = PageRequest.of(pageable.pageNumber, pageable.pageSize)
+        return executeExcludingNthQuery(pageable, n) { excludedId, rank, unsortedPageable ->
+            realNewsRepository.findQByCategoryExcludingNth(category, excludedId, rank, unsortedPageable)
+        }
+    }
 
-        return realNewsRepository.findQByCategoryExcludingNth(category, excludedId, n + 1, unsortedPageable)
+    private fun executeExcludingNthQuery(
+        pageable: Pageable, n: Int,
+        queryFunction: (Long, Int, Pageable) -> Page<RealNews>
+    ): Page<RealNewsDto> {
+        val excludedId = todayNewsOrRecent
+        val unsortedPageable = createUnsortedPageable(pageable)
+        
+        return queryFunction(excludedId, n + 1, unsortedPageable)
             .map { realNews -> realNewsMapper.toDto(realNews) }
     }
+
+    private fun createUnsortedPageable(pageable: Pageable): Pageable = 
+        PageRequest.of(pageable.pageNumber, pageable.pageSize)
 
     @Transactional(readOnly = true)
     fun getAllRealNewsList(pageable: Pageable): Page<RealNewsDto> {
@@ -87,7 +95,7 @@ class RealNewsService(
 
     @get:Transactional(readOnly = true)
     val todayNewsOrRecent: Long
-        get() = todayNewsRepository.findTopByOrderBySelectedDateDesc()
+        get() = todayNewsRepository.findQTopByOrderBySelectedDateDescWithDetailQuizzes()
             ?.realNews?.id ?: -1L
 
 }

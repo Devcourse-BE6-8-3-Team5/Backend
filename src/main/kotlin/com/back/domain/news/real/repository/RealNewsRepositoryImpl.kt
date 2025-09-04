@@ -1,8 +1,10 @@
 package com.back.domain.news.real.repository
 
 import com.back.domain.news.common.enums.NewsCategory
+import com.back.domain.news.fake.entity.QFakeNews
 import com.back.domain.news.real.entity.QRealNews
 import com.back.domain.news.real.entity.RealNews
+import com.back.domain.quiz.detail.entity.QDetailQuiz
 import com.querydsl.jpa.impl.JPAQueryFactory
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageImpl
@@ -170,6 +172,26 @@ class RealNewsRepositoryImpl(
             .orderBy(qRealNews.createdDate.desc())
             .offset((targetRank - 1).toLong())
             .limit(1)
+            .fetchOne()
+    }
+
+    override fun findQByIdWithFakeNews(id: Long): RealNews? {
+        return jpaQueryFactory
+            .select(qRealNews)
+            .from(qRealNews)
+            .leftJoin(QFakeNews.fakeNews).on(QFakeNews.fakeNews.id.eq(qRealNews.id)).fetchJoin()
+            .where(qRealNews.id.eq(id))
+            .fetchOne()
+    }
+
+    override fun findQByIdWithDetailQuizzes(id: Long): RealNews? {
+        val qDetailQuiz = QDetailQuiz.detailQuiz
+        
+        return jpaQueryFactory
+            .select(qRealNews)
+            .from(qRealNews)  
+            .leftJoin(qDetailQuiz).on(qDetailQuiz.realNews().eq(qRealNews)).fetchJoin()
+            .where(qRealNews.id.eq(id))
             .fetchOne()
     }
 
