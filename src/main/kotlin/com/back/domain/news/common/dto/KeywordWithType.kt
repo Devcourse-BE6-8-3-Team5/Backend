@@ -9,4 +9,6 @@ import jakarta.persistence.Enumerated
 data class KeywordWithType(
         val keyword: String,
         @field:Enumerated(EnumType.STRING) val keywordType: KeywordType
-)
+){
+        override fun toString(): String = "$keyword($keywordType)"
+}

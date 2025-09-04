@@ -6,12 +6,14 @@ import java.time.LocalDate
 
 interface KeywordHistoryRepositoryCustom{
 
-    fun findOverusedKeywords(startDate: LocalDate, threshold: Int): List<String>
+    fun findQOverusedKeywords(startDate: LocalDate, threshold: Int): List<String>
 
-    fun findKeywordsByUsedDate(date: LocalDate): List<String>
+    fun findQKeywordsByUsedDate(date: LocalDate): List<String>
+    
+    fun findQMostRecentKeywords(): List<KeywordHistory>
 
-    fun deleteByUsedDateBefore(cutoffDate: LocalDate): Long
+    fun deleteQByUsedDateBefore(cutoffDate: LocalDate): Long
 
-    fun findByKeywordsAndCategoryAndUsedDate(keywords: List<String>, category: NewsCategory, usedDate: LocalDate): List<KeywordHistory>
+    fun findQByKeywordsAndCategoryAndUsedDate(keywords: List<String>, category: NewsCategory, usedDate: LocalDate): List<KeywordHistory>
 
 }
