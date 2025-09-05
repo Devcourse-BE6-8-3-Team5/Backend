@@ -3,6 +3,7 @@ package com.back.global.ai.processor
 
 import com.back.domain.news.common.dto.KeywordGenerationReqDto
 import com.back.domain.news.common.dto.KeywordGenerationResDto
+import com.back.domain.news.common.dto.KeywordWithType
 import com.back.domain.news.common.enums.KeywordType
 import com.fasterxml.jackson.databind.ObjectMapper
 import io.mockk.every
@@ -35,7 +36,10 @@ class KeywordGeneratorProcessorTest {
         objectMapper = ObjectMapper()
         keywordGenerationReqDto = KeywordGenerationReqDto(
             currentDate = LocalDate.of(2025, 8, 29),
-            recentKeywordsWithTypes = listOf("AI(BREAKING), 부동산(ONGOING)"),
+            recentKeywordsWithTypes = listOf(
+                KeywordWithType("AI", KeywordType.BREAKING),
+                KeywordWithType("부동산", KeywordType.ONGOING)
+            ),
             excludeKeywords = listOf("폭염", "K팝")
         )
         processor = KeywordGeneratorProcessor(keywordGenerationReqDto, objectMapper)
@@ -140,7 +144,8 @@ class KeywordGeneratorProcessorTest {
         // then
         val expectedTexts = listOf(
             "2025-08-29",
-            "AI(BREAKING), 부동산(ONGOING)",
+            "AI(BREAKING)",
+            "부동산(ONGOING)",
             "폭염",
             "K팝",
             "Task: 오늘 뉴스 수집을 위한"

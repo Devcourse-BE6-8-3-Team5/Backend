@@ -94,10 +94,8 @@ class DetailQuizService(
     // 생성한 퀴즈 DB에 저장
     @Transactional
     fun saveQuizzes(newsId: Long, quizzes: List<DetailQuizDto>): List<DetailQuiz> {
-        val news = realNewsRepository.findById(newsId)
-            .orElseThrow {
-                ServiceException(404, "해당 id의 뉴스가 존재하지 않습니다. id: $newsId")
-            }
+        val news = realNewsRepository.findQByIdWithDetailQuizzes(newsId)
+            ?: throw ServiceException(404, "해당 id의 뉴스가 존재하지 않습니다. id: $newsId")
 
         detailQuizRepository.deleteByRealNewsId(newsId) // 기존 퀴즈 삭제
         news.detailQuizzes.clear()

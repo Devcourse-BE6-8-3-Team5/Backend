@@ -15,11 +15,17 @@ class KeywordHistoryService(private val keywordHistoryRepository: KeywordHistory
 
     @Transactional
     fun saveKeywords(keywords: KeywordGenerationResDto, usedDate: LocalDate) {
-        saveKeywordsByCategory(keywords.society, NewsCategory.SOCIETY, usedDate)
-        saveKeywordsByCategory(keywords.economy, NewsCategory.ECONOMY, usedDate)
-        saveKeywordsByCategory(keywords.politics, NewsCategory.POLITICS, usedDate)
-        saveKeywordsByCategory(keywords.culture, NewsCategory.CULTURE, usedDate)
-        saveKeywordsByCategory(keywords.it, NewsCategory.IT, usedDate)
+        val categoryMappings = mapOf(
+            NewsCategory.SOCIETY to keywords.society,
+            NewsCategory.ECONOMY to keywords.economy,
+            NewsCategory.POLITICS to keywords.politics,
+            NewsCategory.CULTURE to keywords.culture,
+            NewsCategory.IT to keywords.it
+        )
+        
+        categoryMappings.forEach { (category, keywordList) ->
+            saveKeywordsByCategory(keywordList, category, usedDate)
+        }
     }
 
 
@@ -30,7 +36,7 @@ class KeywordHistoryService(private val keywordHistoryRepository: KeywordHistory
     ) {
         val keywordStrings = keywords.map { it.keyword }
 
-        val existingKeywords = keywordHistoryRepository.findByKeywordsAndCategoryAndUsedDate(
+        val existingKeywords = keywordHistoryRepository.findQByKeywordsAndCategoryAndUsedDate(
             keywordStrings, category, usedDate
         )
 
@@ -49,25 +55,24 @@ class KeywordHistoryService(private val keywordHistoryRepository: KeywordHistory
         keywordHistoryRepository.saveAll(keywordHistories)
     }
 
+    @Transactional(readOnly = true)
+    fun getMostRecentKeywords(): List<KeywordWithType> {
+        return keywordHistoryRepository.findQMostRecentKeywords()
+            .map { KeywordWithType(it.keyword, it.keywordType) }
+    }
+
+    @Transactional(readOnly = true)
+    fun getExcludeKeywords(overuseDays: Int, overuseThreshold: Int): List<String> {
+        // 과도하게 사용된 키워드만 제외
+        return getOverusedKeywords(overuseDays, overuseThreshold)
+    }
+
     // 1. 최근 5일간 3회 이상 사용된 키워드 (과도한 반복 방지)
     @Transactional(readOnly = true)
     fun getOverusedKeywords(days: Int, minUsage: Int): List<String> {
         val startDate = LocalDate.now().minusDays(days.toLong())
 
-        return keywordHistoryRepository.findOverusedKeywords(startDate, minUsage)
+        return keywordHistoryRepository.findQOverusedKeywords(startDate, minUsage)
     }
 
-    @Transactional(readOnly = true)
-    fun getYesterdayKeywords(): List<String>{
-        val yesterday = LocalDate.now().minusDays(1)
-
-        return keywordHistoryRepository.findKeywordsByUsedDate(yesterday)
-    }
-
-    fun getRecentKeywords(recentDays: Int): List<String> {
-        val startDate = LocalDate.now().minusDays(recentDays.toLong())
-        val histories = keywordHistoryRepository.findByUsedDateGreaterThanEqual(startDate)
-
-        return histories.map { it.keyword }.distinct()
-    }
 }

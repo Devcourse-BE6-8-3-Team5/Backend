@@ -70,7 +70,7 @@ class DailyQuizService(
 
     @Transactional
     fun createDailyQuiz(todayNewsId: Long) {
-        val todayNews = todayNewsRepository.findById(todayNewsId).orElse(null)
+        val todayNews = todayNewsRepository.findQByIdWithDetailQuizzes(todayNewsId)
             ?: throw ServiceException(404, "해당 ID의 오늘의 뉴스가 없습니다.")
 
         if (dailyQuizRepository.existsByTodayNews(todayNews)) {
@@ -94,7 +94,7 @@ class DailyQuizService(
     @Transactional
     fun createDailyQuiz() {
         val today = LocalDate.now()
-        val todayNews = todayNewsRepository.findBySelectedDate(today)
+        val todayNews = todayNewsRepository.findQBySelectedDateWithDetailQuizzes(today)
             ?: throw ServiceException(404, "오늘의 뉴스가 존재하지 않습니다.")
 
         if (dailyQuizRepository.existsByTodayNews(todayNews)) {

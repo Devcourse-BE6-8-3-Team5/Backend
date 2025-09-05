@@ -62,14 +62,14 @@ class KeywordHistoryRepositoryTest {
     @Test
     @DisplayName("특정 기간 이후 임계값 이상 사용된 키워드 조회")
     fun findOverusedKeywords() {
-        val result = keywordHistoryRepository.findOverusedKeywords(LocalDate.now().minusDays(2), 3)
+        val result = keywordHistoryRepository.findQOverusedKeywords(LocalDate.now().minusDays(2), 3)
         assertThat(result).contains("중복키워드")
     }
 
     @Test
     @DisplayName("특정 날짜에 사용된 키워드 조회")
     fun findKeywordsByUsedDate() {
-        val todayKeywords = keywordHistoryRepository.findKeywordsByUsedDate(LocalDate.now())
+        val todayKeywords = keywordHistoryRepository.findQKeywordsByUsedDate(LocalDate.now())
         assertThat(todayKeywords).contains("중복키워드")
     }
 
@@ -77,7 +77,7 @@ class KeywordHistoryRepositoryTest {
     @DisplayName("특정 날짜 이전 키워드 삭제")
     fun deleteByUsedDateBefore() {
         val cutoffDate = LocalDate.now().minusDays(1)
-        val deleted = keywordHistoryRepository.deleteByUsedDateBefore(cutoffDate)
+        val deleted = keywordHistoryRepository.deleteQByUsedDateBefore(cutoffDate)
 
         // 각 카테고리별로 하루 이상 지난 키워드들이 삭제됨
         assertThat(deleted).isGreaterThan(0)
@@ -87,7 +87,7 @@ class KeywordHistoryRepositoryTest {
     @DisplayName("키워드 목록, 카테고리, 사용일자로 조회")
     fun findByKeywordsAndCategoryAndUsedDate() {
         val today = LocalDate.now()
-        val result = keywordHistoryRepository.findByKeywordsAndCategoryAndUsedDate(
+        val result = keywordHistoryRepository.findQByKeywordsAndCategoryAndUsedDate(
             keywords = listOf("중복키워드", "ECONOMY_키워드1"),
             category = NewsCategory.ECONOMY,
             usedDate = today

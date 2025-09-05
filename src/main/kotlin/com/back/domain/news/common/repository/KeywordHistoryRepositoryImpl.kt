@@ -17,7 +17,7 @@ class KeywordHistoryRepositoryImpl(
         /**
          * 특정 기간 이후 임계값 이상 사용된 키워드 조회
          */
-        override fun findOverusedKeywords(startDate: LocalDate, threshold: Int): List<String> {
+        override fun findQOverusedKeywords(startDate: LocalDate, threshold: Int): List<String> {
             return jpaQueryFactory
                 .select(qKeywordHistory.keyword)
                 .from(qKeywordHistory)
@@ -33,7 +33,7 @@ class KeywordHistoryRepositoryImpl(
         /**
          * 특정 날짜에 사용된 키워드들 조회(해당 날짜만)
          */
-        override fun findKeywordsByUsedDate(date: LocalDate): List<String> {
+        override fun findQKeywordsByUsedDate(date: LocalDate): List<String> {
             return jpaQueryFactory
                 .selectDistinct(qKeywordHistory.keyword)
                 .from(qKeywordHistory)
@@ -47,7 +47,7 @@ class KeywordHistoryRepositoryImpl(
         /**
          * 특정 날짜 이전의 키워드 기록 삭제
          */
-        override fun deleteByUsedDateBefore(cutoffDate: LocalDate): Long {
+        override fun deleteQByUsedDateBefore(cutoffDate: LocalDate): Long {
             return jpaQueryFactory
                 .delete(qKeywordHistory)
                 .where(
@@ -59,7 +59,7 @@ class KeywordHistoryRepositoryImpl(
         /**
          * 키워드 목록, 카테고리, 사용일자로 키워드 기록 조회
          */
-       override fun findByKeywordsAndCategoryAndUsedDate(
+       override fun findQByKeywordsAndCategoryAndUsedDate(
             keywords: List<String>,
             category: NewsCategory,
             usedDate: LocalDate
@@ -73,6 +73,23 @@ class KeywordHistoryRepositoryImpl(
                     category.let { qKeywordHistory.category.eq(it) },
                     usedDate.let { qKeywordHistory.usedDate.eq(it) }
                 )
+                .fetch()
+        }
+
+        /**
+         * 가장 최근 사용된 키워드들 조회 (가장 최신 날짜의 모든 키워드와 타입)
+         */
+        override fun findQMostRecentKeywords(): List<KeywordHistory> {
+            // 1. 가장 최근 날짜 조회
+            val mostRecentDate = jpaQueryFactory
+                .select(qKeywordHistory.usedDate.max())
+                .from(qKeywordHistory)
+                .fetchOne() ?: return emptyList()
+
+            // 2. 해당 날짜의 모든 키워드 히스토리 조회 (타입 정보 포함)
+            return jpaQueryFactory
+                .selectFrom(qKeywordHistory)
+                .where(qKeywordHistory.usedDate.eq(mostRecentDate))
                 .fetch()
         }
 }

@@ -28,7 +28,7 @@ class KeywordCleanupService(
         val cutoffDate = LocalDate.now().minusDays(retentionDays.toLong())
 
         runCatching {
-            val deletedCount = keywordHistoryRepository.deleteByUsedDateBefore(cutoffDate)
+            val deletedCount = keywordHistoryRepository.deleteQByUsedDateBefore(cutoffDate)
             log.info("키워드 정리 완료 - {}일 이전 키워드 {}개 삭제", retentionDays, deletedCount)
         }.getOrElse { e ->
             log.error("키워드 정리 중 오류 발생: ${e.message}")
@@ -42,7 +42,7 @@ class KeywordCleanupService(
         val cutoffDate = LocalDate.now().minusDays(days.toLong())
 
         runCatching {
-            keywordHistoryRepository.deleteByUsedDateBefore(cutoffDate)
+            keywordHistoryRepository.deleteQByUsedDateBefore(cutoffDate)
         }.onSuccess { deletedCount ->
             log.info("관리자 키워드 정리 완료 - {}일 이전 키워드 {}개 삭제", retentionDays, deletedCount)
         }.onFailure { e ->

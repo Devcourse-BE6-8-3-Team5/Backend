@@ -49,7 +49,7 @@ class AdminNewsService(
         keywordGenerationService.generateTodaysKeywords().keywords
             .let { generated -> newsDataService.addKeywords(generated, STATIC_KEYWORDS) }
             .let { keywords -> newsDataService.collectMetaDataFromNaver(keywords) }
-            .let { metadata -> newsDataService.createRealNewsDtoByCrawl(metadata) }
+            .let { metadata -> newsDataService.createRealNewsByWebCrawling(metadata) }
             .let { crawledNews -> newsAnalysisService.filterAndScoreNews(crawledNews) }
             .let { analyzedNews -> newsDataService.selectNewsByScore(analyzedNews) }
             .let { selectedNews -> newsDataService.saveAllRealNews(selectedNews) }

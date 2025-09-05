@@ -39,8 +39,8 @@ class KeywordGenerationService(
 
     fun generateTodaysKeywords(): KeywordGenerationResDto {
         val today = LocalDate.now()
-        val excludeKeywords = getExcludeKeywords()
-        val recentKeywords = keywordHistoryService.getRecentKeywords(recentDays)
+        val excludeKeywords = keywordHistoryService.getExcludeKeywords(overuseDays, overuseThreshold)
+        val recentKeywords = keywordHistoryService.getMostRecentKeywords()
 
         runCatching { keywordCleanupService.cleanupKeywords() }
             .onFailure { e -> log.warn("키워드 정리 중 오류 발생: ${e.message}") }
@@ -76,15 +76,4 @@ class KeywordGenerationService(
     private fun List<String>.toKeywords(): List<KeywordWithType> =
         map { KeywordWithType(it, KeywordType.GENERAL) }
 
-    fun getExcludeKeywords(): List<String> {
-
-        return buildList {
-            // 과도하게 사용된 키워드 추가
-            addAll(keywordHistoryService.getOverusedKeywords(overuseDays, overuseThreshold))
-            // 어제 사용된 키워드 추가
-            addAll(keywordHistoryService.getYesterdayKeywords())
-        }.distinct().also { excludeKeywords ->
-            log.debug("제외 키워드 목록: {}", excludeKeywords)
-        }
-    }
 }

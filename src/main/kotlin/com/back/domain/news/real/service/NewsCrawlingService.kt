@@ -14,7 +14,7 @@ class NewsCrawlingService {
         private val log = LoggerFactory.getLogger(NewsCrawlingService::class.java)
     }
     // 단건 크롤링
-    fun crawladditionalInfo(naverNewsUrl: String): NewsDetailDto? {
+    fun crawlAdditionalInfo(naverNewsUrl: String): NewsDetailDto? {
         return runCatching {
             val doc = Jsoup.connect(naverNewsUrl)
                 .userAgent("Mozilla/5.0 (Windows NT 10.0; Win64; x64)")

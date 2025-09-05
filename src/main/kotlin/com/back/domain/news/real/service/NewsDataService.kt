@@ -37,12 +37,12 @@ class NewsDataService(
     }
 
     @Transactional
-    fun createRealNewsDtoByCrawl(metaDataList: List<NaverNewsDto>): List<RealNewsDto> {
+    fun createRealNewsByWebCrawling(metaDataList: List<NaverNewsDto>): List<RealNewsDto> {
         val allRealNewsDtos = mutableListOf<RealNewsDto>()
 
         return runCatching {
             for (metaData in metaDataList) {
-                val newsDetailData = newsCrawlingService.crawladditionalInfo(metaData.link)
+                val newsDetailData = newsCrawlingService.crawlAdditionalInfo(metaData.link)
 
                 if (newsDetailData == null) {
                     log.warn("크롤링 실패: {}", metaData.link)
