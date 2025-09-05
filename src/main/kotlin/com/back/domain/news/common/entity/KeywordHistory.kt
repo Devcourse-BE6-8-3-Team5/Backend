@@ -8,6 +8,9 @@ import java.time.LocalDateTime
 
 
 @Entity
+@Table(uniqueConstraints = [
+    UniqueConstraint(columnNames = ["keyword", "category", "keyword_type"])
+])
 data class KeywordHistory(
     var keyword: String,
     @field:Enumerated(EnumType.STRING) var keywordType: KeywordType,
